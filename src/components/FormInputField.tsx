@@ -1,6 +1,8 @@
+/* tslint:disable comment-format */
+// @ts-nocheck
 import React from 'react';
-import {View, StyleSheet, TextInput} from 'react-native';
-import {FontAwesome} from '@expo/vector-icons';
+import {View, StyleSheet, TextInput, Platform} from 'react-native';
+import {MaterialIcons} from '@expo/vector-icons';
 // use default Material design 3 theme
 import {useTheme} from 'react-native-paper';
 
@@ -9,16 +11,42 @@ interface FormInputFieldProps {
   placeholderText: string;
   placeholderTextColor: string;
   autoCorrect: boolean;
+  keyboardType?: string;
+  textContentType?: string;
+  clearTextOnFocus?: boolean;
+  secureTextEntry?: boolean;
+  onChangeText?: () => {};
+  onBlur?: () => {};
+  autoFocus?: boolean ;
+  autoCapitalize?: string,
+  value: string | number;
 }
 
-const FormInputField = ({iconName, placeholderText, placeholderTextColor, autoCorrect}:FormInputFieldProps) => {
+
+const FormInputField = ({
+      iconName, 
+      placeholderText, 
+      placeholderTextColor, 
+      autoCorrect, 
+      keyboardType, 
+      textContentType,
+      clearTextOnFocus,
+      secureTextEntry,
+      onChangeText,
+      onBlur,
+      autoFocus,
+      autoCapitalize,
+      value
+    }:FormInputFieldProps) => {
     const {colors} = useTheme();
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     return (
         <View style={styles.action}>
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-nocheck
-          <FontAwesome name={iconName} color={colors.text} size={20} />
+          <View className="flex self-center justify-self-center pl-2">
+            <MaterialIcons name={iconName} color={colors.text} size={20}/>
+          </View>
           <TextInput
             placeholder={placeholderText}
             placeholderTextColor={placeholderTextColor}
@@ -29,6 +57,15 @@ const FormInputField = ({iconName, placeholderText, placeholderTextColor, autoCo
                 color: colors.text,
               },
             ]}
+            keyboardType={keyboardType}
+            textContentType={textContentType}
+            clearTextOnFocus={clearTextOnFocus}
+            secureTextEntry={secureTextEntry}
+            onChangeText={onChangeText}
+            onBlur={onBlur}
+            autoFocus={autoFocus}
+            autoCapitalize={autoCapitalize}
+            value ={value}
           />
         </View>
     );
@@ -36,12 +73,12 @@ const FormInputField = ({iconName, placeholderText, placeholderTextColor, autoCo
 
 const styles = StyleSheet.create({
     action: {
+        width: "100%",
         flexDirection: 'row',
         marginTop: 10,
         marginBottom: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: '#f2f2f2',
-        paddingBottom: 5,
+        borderWidth: 1,
+        height: 40,
       },
       textInput: {
         flex: 1,
