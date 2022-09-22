@@ -3,13 +3,14 @@ import { View, Text, TouchableWithoutFeedback, Keyboard, Alert} from 'react-nati
 import React from 'react'
 import FormInputField from './FormInputField';
 import AuthButton from './AuthButton';
+import LoadingButton from './LoadingButton';
 import { Formik } from 'formik';
 import * as yup from 'yup';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../utils/useAuth';
 
 export default function ForgotPasswordForm() {
-  // const {forgotPassword} = useAuth()
+  const {forgotPassword, loading} = useAuth()
   const navigation = useNavigation()
   
   const ForgotPasswordSchema = yup.object().shape({
@@ -24,7 +25,7 @@ export default function ForgotPasswordForm() {
             validationSchema={ForgotPasswordSchema}
             onSubmit={async (values) => {
                 try{
-                    // await forgotPassword(values.email)
+                    await forgotPassword(values.email)
                     navigation.navigate('Profile');
                 } catch (err){
                     Alert.alert("Error signing in, please try again.")
@@ -55,7 +56,8 @@ export default function ForgotPasswordForm() {
                   value={values.email}
                 />
                 {touched.email && errors.email && <Text className="text-red-500">{errors.email}</Text>}
-                <AuthButton btnText="Reset Password" btnAction={handleSubmit}/>
+                {loading ? <LoadingButton btnText="Reset Password"/>
+                :(<AuthButton btnText="Reset Password" btnAction={handleSubmit}/>)}
               </>)}
       </Formik>
     </View>

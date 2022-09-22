@@ -3,13 +3,14 @@ import { View, Text, TouchableWithoutFeedback,Keyboard, Pressable, Alert } from 
 import React from 'react'
 import FormInputField from './FormInputField'
 import AuthButton from './AuthButton'
+import LoadingButton from './LoadingButton';
 import {useNavigation} from '@react-navigation/native';
 import * as yup from 'yup';
 import { Formik } from 'formik';
 import { useAuth } from '../utils/useAuth';
 
 export default function LoginForm() {
-    const {signIn} = useAuth();
+    const {login, loading} = useAuth();
     // const signIn = () => {}
     const navigation = useNavigation()
 
@@ -30,10 +31,10 @@ export default function LoginForm() {
             validationSchema={LoginSchema}
             onSubmit={async (values) => {
                 try{
-                    await signIn(values.email, values.password)
+                    await login(values.email, values.password)
                     navigation.navigate('Profile');
                 } catch (err){
-                    Alert.alert("Error signing in, please try again.")
+                    Alert.alert(`${err.message} Please try again.`)
                     navigation.navigate('Login')
                 }
             }}
@@ -77,10 +78,12 @@ export default function LoginForm() {
                   value={values.password}
                 />
                 {touched.password && errors.password && <Text className="text-red-500">{errors.password}</Text>}
-                <AuthButton 
+               {loading 
+               ? <LoadingButton btnText="Login" />
+               : (<AuthButton 
                   btnText="Login" 
                   btnAction={handleSubmit}
-                />
+                />)}
               </>
               )}
             </Formik>

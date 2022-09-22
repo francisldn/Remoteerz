@@ -3,6 +3,7 @@ export interface User {
     uid: string;
     username: string; 
     email:string;
+    avatar:string; 
     display_status:boolean; //public, private
     relationship_status:string; // single, partnered, 
     gender_preference:string; //men, women, both
@@ -16,12 +17,16 @@ export interface User {
     job_title:string;
     skills: string[];
     countries_travelled: string[];
+    countries_lived:string[]
     last_destination:string;
     next_destination:string;
     phone_number:number;
     photo:string[]; 
-    myFriends:User[];
-    myEvents:Event[];
+    myFriends:[{
+        userid:string,
+        username:string,
+    }];
+    myEvents:[];
     location:{
         location_name:string,
         lat:number,

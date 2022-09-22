@@ -9,9 +9,9 @@ import {
     User, // type for user
     sendPasswordResetEmail
 } from 'firebase/auth';
-// import {db} from './firebase/firebaseConfig';
+import {db} from './firebase/firebaseConfig';
 import {auth} from './firebase/firebaseConfig';
-// import { doc, setDoc} from 'firebase/firestore';
+import { doc, setDoc} from 'firebase/firestore';
 
 // interface AuthProps {
 //     user:User,
@@ -26,16 +26,17 @@ import {auth} from './firebase/firebaseConfig';
 const AuthContext = createContext<AuthProps>({
     user:null,
     signUp: async () => {},
-    signIn: async () => {},
+    login: async () => {},
     logout: async () => {},
     forgotPassword: async() => {},
     error: null,
-    loading: false
+    initialloading: true,
+    loading:false,
 })
 
 export const AuthProvider = ({children}) => {
-    const [loading, setLoading] = useState(true)
-    // const [initialLoading, setInitialLoading] = useState(true)
+    const [loading, setLoading] = useState(false)
+    const [initialLoading, setInitialLoading] = useState(true)
     // firebase user
     const [user, setUser] = useState(null) 
     const [error, setError] = useState('')
@@ -49,46 +50,78 @@ export const AuthProvider = ({children}) => {
                         setUser(null)
                     }
                  })
-        setLoading(false)
+        setInitialLoading(false)
         return unsubscribe;
     }, [])
     
     // sign up with email and password
-    const signUp = async (username, email, password) => {
+    const signUp = async (email, password) => {
+        setLoading(true)
         try {
             await createUserWithEmailAndPassword(auth,email,password)
             .then(userCredential => setUser(userCredential.user))
             console.log('user', user)
-
-            // await setDoc(doc(db, 'Users', user.uid),
-            // {
-            //     id: user.uid,
-            //     email:user.email,
-            //     lat: 41.390205 + Number(Math.round(Math.random()) ? Math.random()*1.2 : Math.random()* (-1.2)),
-            //     long: 2.154007 + Number(Math.round(Math.random()) ? Math.random()*1.2 : Math.random()* (-1.2)),
-            //     myEvents:[],
-            //     myFriends:[],
-            //     myGroups:[],
-            // })
+            await setDoc(doc(db, 'Users', user.uid),
+            {
+                uid: user.uid,
+                email:user.email,
+                avatar:null,
+                username:null,
+                display_status: null,
+                relationship_status:null,
+                gender_preference:null,
+                sexual_orientation: null,
+                dietary_preference: null,
+                age:null,
+                dob:null,
+                gender: null,
+                about: null,
+                interests: null,
+                job_title: null,
+                skills: null,
+                countries_travelled: null,
+                countries_lived:null,
+                last_destination: null,
+                next_destination: null,
+                phone_number:null,
+                location: {
+                    location_name: '',
+                    latitude:'',
+                    longitude:''
+                },
+                myEvents:[],
+                myFriends:[],
+                chatrooms:[],
+            })
+            .catch(error => {throw new Error(error)})
         } catch (error) {
-            console.log('error signing up:', error);
-            setError(error.message)
-            throw new Error(error.message)
+            if(error.code.includes("email-already-in-use")) {
+                setError('This email has been registered before.')
+                throw new Error('This email has been registered before.')
+            }
+            setError(error)
+            setLoading(false)
+            throw new Error(error)
         }
         setLoading(false)
     }
     
     // sign in with email and password
     // use signInwithEmailandPassword function from firebase
-    const signIn = async (email, password) => {
+    const login = async (email, password) => {
         setLoading(true)
         try {
             await signInWithEmailAndPassword(auth, email, password);
             setUser(auth.currentUser)
         } catch (error) {
-            console.log('Error signing in', error);
-            setError(error.message)
-            throw new Error(error.message)
+            console.log(error.code);
+            if(error.code.includes("wrong-password")) {
+                setError('Wrong password.')
+                throw new Error('Wrong password.')
+            }
+            setError(error.code)
+            setLoading(false)
+            throw new Error(error.code)
         }
         setLoading(false);
     }
@@ -103,12 +136,14 @@ export const AuthProvider = ({children}) => {
         } catch (error) {
             console.log('error logging out: ', error);
             setError(error.message)
+            setLoading(false)
             throw new Error(error.message)
         }
         setLoading(false)
     }
 
     const forgotPassword = async (email) => {
+        setLoading(true)
         try{
             await sendPasswordResetEmail(auth, email).then(
                 console.log("email sent")
@@ -116,9 +151,10 @@ export const AuthProvider = ({children}) => {
         } catch (error) {
             console.log('error with resetting password:', error);
             setError(error.message)
+            setLoading(false)
             throw new Error(error.message)
         }
-        
+        setLoading(false)
     }
     
     // more performant
@@ -126,12 +162,13 @@ export const AuthProvider = ({children}) => {
     const memoedValue = useMemo(() => ({
         user, 
         signUp, 
-        signIn, 
-        loading, 
+        login, 
+        loading,
+        initialLoading,
         logout,
         error,
-        forgotPassword
-    }), [user, loading, error])
+        forgotPassword,
+    }), [user,initialLoading,loading,error])
 
 
     return (

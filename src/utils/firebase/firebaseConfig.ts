@@ -2,6 +2,7 @@
 import { initializeApp } from "firebase/app";
 import {getFirestore} from 'firebase/firestore';
 import {getAuth} from 'firebase/auth'
+// how to add env variables in react native app  - https://levelup.gitconnected.com/using-environment-variables-in-a-react-native-app-f2dd005d2457
 import {
   RN_APP_APIKEY,
   RN_APP_AUTHDOMAIN,
