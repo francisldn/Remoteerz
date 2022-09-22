@@ -2,15 +2,24 @@
 import { initializeApp } from "firebase/app";
 import {getFirestore} from 'firebase/firestore';
 import {getAuth} from 'firebase/auth'
-
+import {
+  RN_APP_APIKEY,
+  RN_APP_AUTHDOMAIN,
+  RN_APP_PROJECTID,
+  RN_APP_STORAGEBUCKET,
+  RN_APP_MESSAGINGSENDERID,
+  RN_APP_APPID,
+  RN_APP_MEASUREMENTID 
+} from '@env';
+// to put this in .env file
 const firebaseConfig = {
-  apiKey: "AIzaSyDFTZgXlnu0MEXAvtLMNpJL0NR1H5gxoJc",
-  authDomain: "remoteers-360d0.firebaseapp.com",
-  projectId: "remoteers-360d0",
-  storageBucket: "remoteers-360d0.appspot.com",
-  messagingSenderId: "228557775764",
-  appId: "1:228557775764:web:217e6dcd09cebe1d1ee581",
-  measurementId: "G-KGS6EZG8NZ"
+  apiKey: RN_APP_APIKEY,
+  authDomain: RN_APP_AUTHDOMAIN,
+  projectId: RN_APP_PROJECTID,
+  storageBucket: RN_APP_STORAGEBUCKET,
+  messagingSenderId: RN_APP_MESSAGINGSENDERID,
+  appId: RN_APP_APPID,
+  measurementId: RN_APP_MEASUREMENTID
 };
 
 // Initialize Firebase

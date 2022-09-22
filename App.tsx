@@ -3,10 +3,13 @@ import { StyleSheet, Text, View, Pressable, TouchableWithoutFeedback } from 'rea
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { MaterialIcons } from '@expo/vector-icons';
+
 import SignUp from './src/screens/SignUp';
 import Login from './src/screens/Login';
 import ForgotPassword from './src/screens/ForgotPassword';
+import Profile from './src/screens/Profile';
 import { AuthProvider } from './src/utils/useAuth';
+
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -40,6 +43,11 @@ export default function App() {
           <Stack.Screen
               name="ForgotPassword"
               component={ForgotPassword}
+            />
+
+          <Stack.Screen
+              name="Profile"
+              component={Profile}
             />
         </Stack.Navigator>
       </NavigationContainer>

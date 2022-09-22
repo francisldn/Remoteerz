@@ -12,9 +12,9 @@ export default function SignUpForm() {
   const {signUp} = useAuth() 
 
    const SignUpSchema = yup.object().shape({
-      username: yup.string().matches(/^[a-zA-Z0-9]{4,10}$/,{excludeEmptyString:true, message:"Username cannot have special characters and limited to 10 characters only"}).required('Username is required'),
+      username: yup.string().matches(/^[a-zA-Z0-9]{4,10}$/,{excludeEmptyString:true, message:"Username must be between 4-10 characters and contains no special characters"}).required('Username is required'),
       email: yup.string().email('Please enter valid email').required('Email address is required'),
-      password: yup.string().min(8, ({min}) => `Password must be at least ${min} characters`).required('Password is required'),
+      password: yup.string().min(6, ({min}) => `Password must be at least ${min} characters`).required('Password is required'),
       confirmPassword: yup.string().when("password",
       {is: (val:string) => (val && val.length>0 ? true : false), 
       then: yup.string().oneOf([yup.ref('password')], "Passwords must be the same")})
