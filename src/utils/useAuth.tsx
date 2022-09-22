@@ -38,62 +38,68 @@ export const AuthProvider = ({children}) => {
     const [loading, setLoading] = useState(false)
     const [initialLoading, setInitialLoading] = useState(true)
     // firebase user
-    const [user, setUser] = useState(null) 
+    const [currentUser, setCurrentUser] = useState(null) 
     const [error, setError] = useState('')
 
     useEffect(() => {
         // redirect user to login page if user is not signed up
         const unsubscribe = onAuthStateChanged(auth, (user) => {
                     if(user) {
-                        setUser(user)
+                        setCurrentUser(user)
                     } else {
-                        setUser(null)
+                        setCurrentUser(null)
                     }
                  })
         setInitialLoading(false)
         return unsubscribe;
-    }, [])
-    
+    }, [auth])
+
+
     // sign up with email and password
     const signUp = async (email, password) => {
         setLoading(true)
         try {
             await createUserWithEmailAndPassword(auth,email,password)
-            .then(userCredential => setUser(userCredential.user))
-            console.log('user', user)
-            await setDoc(doc(db, 'Users', user.uid),
-            {
-                uid: user.uid,
-                email:user.email,
-                avatar:null,
-                username:null,
-                display_status: null,
-                relationship_status:null,
-                gender_preference:null,
-                sexual_orientation: null,
-                dietary_preference: null,
-                age:null,
-                dob:null,
-                gender: null,
-                about: null,
-                interests: null,
-                job_title: null,
-                skills: null,
-                countries_travelled: null,
-                countries_lived:null,
-                last_destination: null,
-                next_destination: null,
-                phone_number:null,
-                location: {
-                    location_name: '',
-                    latitude:'',
-                    longitude:''
-                },
-                myEvents:[],
-                myFriends:[],
-                chatrooms:[],
+            .then(userCredential => {
+                setCurrentUser(userCredential.user)
+                console.log('user', currentUser)
+                console.log('userCredential', userCredential.user)
+                setDoc(doc(db, 'Users', userCredential.user.uid),
+                {
+                    uid: userCredential.user && userCredential.user.uid,
+                    email: userCredential.user && userCredential.user.email,
+                    avatar:null,
+                    username:null,
+                    display_status: null,
+                    relationship_status:null,
+                    gender_preference:null,
+                    sexual_orientation: null,
+                    dietary_preference: null,
+                    age:null,
+                    dob:null,
+                    gender: null,
+                    about: null,
+                    interests: null,
+                    job_title: null,
+                    skills: null,
+                    countries_travelled: null,
+                    countries_lived:null,
+                    last_destination: null,
+                    next_destination: null,
+                    phone_number:null,
+                    location: {
+                        location_name: '',
+                        latitude:'',
+                        longitude:''
+                    },
+                    myEvents:[],
+                    myFriends:[],
+                    chatrooms:[],
+                })
+                .then(() => {console.log('successful')})
+                .catch((error) => {throw new Error(error)})
             })
-            .catch(error => {throw new Error(error)})
+
         } catch (error) {
             if(error.code.includes("email-already-in-use")) {
                 setError('This email has been registered before.')
@@ -114,7 +120,6 @@ export const AuthProvider = ({children}) => {
             await signInWithEmailAndPassword(auth, email, password);
             setUser(auth.currentUser)
         } catch (error) {
-            console.log(error.code);
             if(error.code.includes("wrong-password")) {
                 setError('Wrong password.')
                 throw new Error('Wrong password.')
@@ -160,7 +165,7 @@ export const AuthProvider = ({children}) => {
     // more performant
     // similar to useEffect but only re-compute if one of the dependencies changes
     const memoedValue = useMemo(() => ({
-        user, 
+        currentUser, 
         signUp, 
         login, 
         loading,
@@ -168,7 +173,8 @@ export const AuthProvider = ({children}) => {
         logout,
         error,
         forgotPassword,
-    }), [user,initialLoading,loading,error])
+        setLoading
+    }), [currentUser,initialLoading,loading,error])
 
 
     return (

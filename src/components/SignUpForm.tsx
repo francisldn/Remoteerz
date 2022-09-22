@@ -10,7 +10,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../utils/useAuth';
 
 export default function SignUpForm() {
-  const {signUp, loading, error} = useAuth() 
+  const {signUp, loading, setLoading} = useAuth() 
 
    const SignUpSchema = yup.object().shape({
       // username: yup.string().matches(/^[a-zA-Z0-9]{4,10}$/,{excludeEmptyString:true, message:"Username must be between 4-10 characters and contains no special characters"}).required('Username is required'),
@@ -38,6 +38,7 @@ export default function SignUpForm() {
                 } catch (err){
                     Alert.alert(`${err.message} Please try again.`)
                     navigation.navigate('SignUp')
+                    setLoading(false)
                 }
             }}
         >

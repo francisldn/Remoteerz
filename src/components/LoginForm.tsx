@@ -10,7 +10,7 @@ import { Formik } from 'formik';
 import { useAuth } from '../utils/useAuth';
 
 export default function LoginForm() {
-    const {login, loading} = useAuth();
+    const {login, loading, setLoading} = useAuth();
     // const signIn = () => {}
     const navigation = useNavigation()
 
@@ -36,6 +36,7 @@ export default function LoginForm() {
                 } catch (err){
                     Alert.alert(`${err.message} Please try again.`)
                     navigation.navigate('Login')
+                    setLoading(false)
                 }
             }}
         >
