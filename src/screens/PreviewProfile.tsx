@@ -1,10 +1,10 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 
-export default function Chats() {
+export default function PreviewProfile() {
   return (
     <View>
-      <Text>Chats</Text>
+      <Text>PreviewProfile</Text>
     </View>
   )
 }

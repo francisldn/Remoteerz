@@ -1,42 +1,41 @@
 // @ts-nocheck
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, Pressable } from 'react-native'
 import React from 'react'
 import {MaterialIcons} from '@expo/vector-icons';
-import {useTheme} from 'react-native-paper';
-
 interface BottomIconProps {
     iconName:string;
     text:string;
     pressHandler:() => {};
+    textMarginLeft?: number;
+    iconMarginLeft?: number;
+    iconColor?: boolean
 }
 
-export default function BottomIcon({iconName, text, pressHandler}:BottomIconProps) {
+export default function BottomIcon({iconName, text, textMarginLeft, pressHandler,iconMarginLeft, iconColor}:BottomIconProps) {
 
-    const {colors} = useTheme();
   return (
-    <View className="flex align-middle justify-center mx-auto w-40 h-60">
-        <Pressable className="flex self-center justify-self-center pl-2" style={styles.Icon} onPress={pressHandler}>
-        {({ pressed }) => 
-            (<>
-                <MaterialIcons name={iconName} 
-                    color={pressed? 'lightgrey': 'orange'} 
-                    size={40} 
-                />
-                <Text 
-                    className="text-xs"
-                    style={{
-                        color: pressed ? 'lightgrey' : 'orange'
-                    }}
-                >{text}</Text>
-            </>)}
+    <View className="py-[3%]">
+        <Pressable 
+            onPress={pressHandler}
+            >
+
+                <View className="flex self-start pl-1" style={{paddingLeft:iconMarginLeft}}>
+                    <MaterialIcons name={iconName} 
+                            color={iconColor? '#4136e5': 'darkgrey'} 
+                            size={40} 
+                        />
+                </View>
+                <View style={{paddingLeft: textMarginLeft}}>
+                    <Text 
+                        className="text-[11rem]"
+                        style={{
+                            color: iconColor ? '#4136e5' : '#393939',
+                        }}
+                    >{text}</Text>
+                </View>
+                
         </Pressable>
     </View>
   )
 }
 
-const styles = StyleSheet.create({
-    Icon: {
-        width: "100%",
-        height: 40,
-      },
-})

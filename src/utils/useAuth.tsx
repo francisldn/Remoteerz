@@ -57,19 +57,18 @@ export const AuthProvider = ({children}) => {
 
     // sign up with email and password
     const signUp = async (email, password) => {
+        const username= email.split('@')[0]
         setLoading(true)
         try {
             await createUserWithEmailAndPassword(auth,email,password)
             .then(userCredential => {
                 setCurrentUser(userCredential.user)
-                console.log('user', currentUser)
-                console.log('userCredential', userCredential.user)
                 setDoc(doc(db, 'Users', userCredential.user.uid),
                 {
                     uid: userCredential.user && userCredential.user.uid,
                     email: userCredential.user && userCredential.user.email,
                     avatar:null,
-                    username:null,
+                    username: username,
                     display_status: null,
                     relationship_status:null,
                     gender_preference:null,

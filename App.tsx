@@ -8,7 +8,13 @@ import SignUp from './src/screens/SignUp';
 import Login from './src/screens/Login';
 import ForgotPassword from './src/screens/ForgotPassword';
 import Profile from './src/screens/Profile';
+import Dashboard from './src/screens/Dashboard';
+import Hangouts from './src/screens/Hangouts';
+import Chatroom from './src/screens/Chatroom';
+import EditProfile from './src/screens/EditProfile';
+import PreviewProfile from './src/screens/PreviewProfile';
 import { AuthProvider } from './src/utils/useAuth';
+import AccountSettings from './src/screens/AccountSettings';
 
 const Stack = createNativeStackNavigator();
 
@@ -18,7 +24,7 @@ export default function App() {
     <AuthProvider>
       <NavigationContainer>
         <Stack.Navigator>
-            <Stack.Screen
+            {/* <Stack.Screen
               name="Login"
               component={Login}
             />
@@ -43,12 +49,45 @@ export default function App() {
           <Stack.Screen
               name="ForgotPassword"
               component={ForgotPassword}
-            />
+            /> */}
 
           <Stack.Screen
               name="Profile"
               component={Profile}
             />
+          <Stack.Screen
+              name="Dashboard"
+              component={Dashboard}
+              options= {() => ({
+                headerBackVisible:false,
+              })}
+            />
+          <Stack.Screen
+            name="Hangouts"
+            component={Hangouts}
+            options= {() => ({
+              headerBackVisible:false,
+            })}
+          />
+          <Stack.Screen
+            name="Chatroom"
+            component={Chatroom}
+            options= {() => ({
+              headerBackVisible:false,
+            })}
+          />
+          <Stack.Screen
+            name="EditProfile"
+            component={EditProfile}
+          />
+           <Stack.Screen
+            name="PreviewProfile"
+            component={PreviewProfile}
+          />
+          <Stack.Screen
+            name="AccountSettings"
+            component={AccountSettings}
+          />
         </Stack.Navigator>
       </NavigationContainer>
       </AuthProvider>
@@ -58,9 +97,6 @@ export default function App() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+   
   },
 });
