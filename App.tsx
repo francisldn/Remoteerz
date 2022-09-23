@@ -84,7 +84,7 @@ export default function App() {
             name="EditProfile"
             component={EditProfile}
             options= {() => ({
-              title:"",
+              title:"Edit Profile",
             })}
           />
            <Stack.Screen

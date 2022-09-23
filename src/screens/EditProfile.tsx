@@ -9,7 +9,7 @@ import { TouchableRipple } from 'react-native-paper';
 import { useAuth } from '../utils/useAuth';
 import { SimpleLineIcons } from '@expo/vector-icons';
 import ProfileFormInputField from '../components/ProfileFormInputField';
-import { Formik, Field } from 'formik';
+import { Formik, useFormik} from 'formik';
 import * as yup from 'yup';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import ButtonToggleGroup from 'react-native-button-toggle-group';
@@ -25,11 +25,38 @@ export default function EditProfile() {
   const [displayValue, setDisplayValue] = useState("Public");
   const [genderValue, setGenderValue] = useState('Male')
 
+  const {handleSubmit, handleBlur, errors, setValues, values, handleChange, touched} = useFormik({
+    initialValues: {
+        username: currentUserDetails?.username || '',
+        about: currentUserDetails?.about || '',
+        interests: currentUserDetails?.interests || '',
+        display_status: currentUserDetails?.display_status || 'public', //public (true), private (false)
+        sexual_orientation: currentUserDetails?.sexual_orientation || 'straight', //gay, straight, lesbian, bisexual, asexual, curious, none of the above
+        age: currentUserDetails?.age || '',
+        gender: currentUserDetails?.gender|| 'male', //male, female, prefer not to say
+        job_title: currentUserDetails?.job_title || '',
+        skills: currentUserDetails?.skills || '',
+        countries_travelled: currentUserDetails?.countries_travelled || '',
+        countries_lived: currentUserDetails?.countries_lived || '',
+        favourite_cities: currentUserDetails?.favourite_cities || '',
+
+    },
+    validationSchema: ProfileSchema,
+    onSubmit: (values) => {
+        try {
+            console.log(values)
+            //submit the form
+        } catch(error) {
+            Alert.alert("Not saved.")
+        }
+    }
+  })
+
   const ProfileSchema = yup.object().shape({
     username: yup
         .string()
-        // .min(4, "Username too short.")
-        // .max(10,"Max 10 characters allowed.")
+        // .test('len', 'at least 4 characters', val => val.toString().length >= 4)
+        // .test('len', 'max 10 characters', val => val.toString().length <= 10)
         // .required('Username is required')
         .default(currentUserDetails?.username || ''),
     about: yup
@@ -52,46 +79,37 @@ export default function EditProfile() {
         .oneOf(['gay', 'straight','lesbian','bisexual','other'])
         .default(currentUserDetails?.sexual_orientation || '')
         .optional(), //gay, straight, lesbian, bisexual, asexual, curious, none of the above
-    // dietary_preference: yup
-    //     .string()
-    //     .oneOf(['vegan', 'vegetarian', 'pescatarian', 'kosher', 'halal', 'flexitarian', 'carnivore', 'omnivore'])
-    //     .default(currentUserDetails?.dietary_preference || '')
-    //     .optional(), //vegan, vegetarian, pescatarian, kosher, halal, flexitarian, carnivore, omnivore
     age: yup.number('Must be a number')
         .min(16, 'You are not old enough to use this app')
-        .default(currentUserDetails?.age || '')
+        .default(currentUserDetails?.age || 16)
         .optional(),
     gender: yup
         .string()
         .oneOf(['male','female','other'])
-        .default(currentUserDetails?.gender|| '')
+        .default(currentUserDetails?.gender|| 'male')
         .optional(), //male, female, prefer not to say
-    // job_title: yup
-    //     .string()
-    //     .default(currentUserDetails?.job_title || '')
-    //     .optional(),
-    // skills: yup
-    //     .string()
-    //     .default(currentUserDetails?.skills || '')
-    //     .optional(),
-    // countries_travelled: yup
-    //     .string()
-    //     .max(100, "Max 100 characters allowed")
-    //     .default(currentUserDetails?.countries_travelled || '')
-    //     .optional(),
-    // countries_lived: yup
-    //     .string()
-    //     .max(100, "Max 100 characters allowed")
-    //     .default(currentUserDetails?.countries_lived || '')
-    //     .optional(),
-    // last_destination: yup
-    //     .string()
-    //     .default(currentUserDetails?.last_destination || '')
-    //     .optional(),
-    // next_destination:yup
-    //     .string()
-    //     .default(currentUserDetails?.next_destination || '')
-    //     .optional(),
+    job_title: yup
+        .string()
+        .default(currentUserDetails?.job_title || '')
+        .optional(),
+    skills: yup
+        .string()
+        .default(currentUserDetails?.skills || '')
+        .optional(),
+    countries_travelled: yup
+        .string()
+        .max(100, "Max 100 characters allowed")
+        .default(currentUserDetails?.countries_travelled || '')
+        .optional(),
+    countries_lived: yup
+        .string()
+        .max(100, "Max 100 characters allowed")
+        .default(currentUserDetails?.countries_lived || '')
+        .optional(),
+    favourite_cities: yup
+        .string()
+        .default(currentUserDetails?.favourite_cities || '')
+        .optional()
 })
 
   return (
@@ -113,19 +131,21 @@ export default function EditProfile() {
                     {currentUserDetails && currentUserDetails.username}
                 </Text>
             </View>)}
+
+           
             {/* Edit Profile and Show Profile */}
             <View className="flex flex-row justify-around w-full h-[60] items-center mb-[8%]">
-                <View 
-                    className="w-[50%] border-r-[1rem] h-full justify-center border-r-[#b6b6b6]"
-                    style={{backgroundColor: '#fff'}}
+                <TouchableRipple 
+                    className="w-[50%] border-slate-300 border-r-[1rem] h-full justify-center bg-white"
+                    onPress={() => handleSubmit(values)}
                 >
                     <Text 
-                        className="text-xl text-center text-[#141bab] font-bold"
+                        className="text-xl text-center "
                         style={GlobalStyles.CustomFont}
                     >
-                        Edit Profile
+                        Save Profile
                     </Text>
-                </View>
+                </TouchableRipple>
                 <TouchableRipple 
                     className="w-[50%] border-slate-300 border-r-[1rem] h-full justify-center bg-white"
                     onPress={() => navigation.navigate('PreviewProfile')}
@@ -143,42 +163,8 @@ export default function EditProfile() {
                 </View>
                 </TouchableRipple>
             </View>
-
-            <Formik
-             initialValues={{
-                username: currentUserDetails?.username || '',
-                about: currentUserDetails?.about || '',
-                interests: currentUserDetails?.interests || '',
-                display_status: currentUserDetails?.display_status || 'public', //public (true), private (false)
-                sexual_orientation: currentUserDetails?.sexual_orientation || 'straight', //gay, straight, lesbian, bisexual, asexual, curious, none of the above
-                age: currentUserDetails?.age || '',
-                gender: currentUserDetails?.gender|| 'male', //male, female, prefer not to say
-                job_title: currentUserDetails?.job_title || '',
-                skills: currentUserDetails?.skills || '',
-                countries_travelled: currentUserDetails?.countries_travelled || '',
-                countries_lived: currentUserDetails?.countries_lived || '',
-                last_destination: currentUserDetails?.last_destination || '',
-                next_destination:currentUserDetails?.next_destination || ''
-            }}
-            validationSchema={ProfileSchema}
-            onSubmit={(values) => {
-                try {
-                    console.log(values)
-                    //submit the form
-                } catch(error) {
-                    Alert.alert("Not saved.")
-                }
-            }}
-        >
-        {({ values,
-            handleChange,
-            handleBlur,
-            handleSubmit,
-            setValues,
-            touched,
-            errors
-            }) => (
-              <>
+            
+            
               {/* Username */}
                 <ProfileFormInputLabel inputLabel='USERNAME'/>
                 <ProfileFormInputField 
@@ -187,35 +173,40 @@ export default function EditProfile() {
                     placeholderTextColor = {"#666666"}
                     autoCorrect ={false}
                     secureTextEntry = {false}
-                    onChangeText= {() => handleChange('username')}
+                    onChangeText= {(val) => {
+                        setValues(prev => {
+                            return ({...prev, username: val})
+                        })}}
                     onBlur = {() => handleBlur('username')}
                     autoCapitalize = {"none"}
                     value = { values.username || currentUserDetails?.username }
                     multiline = {false}
                 />
-                {touched.username && errors.username && <Text className="text-red-500">{errors.username}</Text>}
+                {touched.username && errors.username && <Text className="text-red-500 pl-[4%] pb-[2%]">{errors.username}</Text>}
                 {/* About */}
                 <ProfileFormInputLabel inputLabel='ABOUT ME'/>
                 <ProfileFormInputField 
                     iconName = {""}
-                    placeholderText = {"Say something fun. Don't take it too seriously."}
+                    placeholderText = {"Say something fun."}
                     placeholderTextColor = {"#666666"}
                     autoCorrect ={false}
                     secureTextEntry = {false}
-                    onChangeText= {() => handleChange('about')}
+                    onChangeText= {(val) => {
+                        setValues(prev => {
+                            return ({...prev, about: val})
+                        })}}
                     onBlur = {() => handleBlur('about')}
                     autoCapitalize = {"none"}
                     value = { values.about || currentUserDetails?.about }
                     multiline = {true}
                     height={100}
                 />
-
-                {touched.about && errors.about && <Text className="text-red-500">{errors.about}</Text>}
+                {touched.about && errors.about && <Text className="text-red-500 pl-[4%] pb-[2%]">{errors.about}</Text>}
 
                 {/* Age*/}
                 <ProfileFormInputLabel inputLabel='AGE'/>
                 <ProfileInputAgePicker setValues={setValues} />
-                {errors.dob && <Text className="text-red-500">{errors.dob}</Text>}
+                {errors.age && <Text className="text-red-500">{errors.age}</Text>}
 
                 {/* Interests */}
                 <ProfileFormInputLabel inputLabel='INTERESTS'/>
@@ -225,14 +216,17 @@ export default function EditProfile() {
                     placeholderTextColor = {"#666666"}
                     autoCorrect ={false}
                     secureTextEntry = {false}
-                    onChangeText= {() => handleChange('interests')}
+                    onChangeText= {(val) => {
+                        setValues(prev => {
+                            return ({...prev, interests: val})
+                        })}}
                     onBlur = {() => handleBlur('interests')}
                     autoCapitalize = {"none"}
                     value = { values.interests || currentUserDetails?.interests }
                     multiline = {true}
                     height={60}
                 />
-                {touched.interests && errors.interests && <Text className="text-red-500">{errors.interests}</Text>}
+                {touched.interests && errors.interests && <Text className="text-red-500 pl-[4%] pb-[2%]">{errors.interests}</Text>}
 
                 {/* Display profile status */}
                 <ProfileFormInputLabel inputLabel='DISPLAY STATUS'/>
@@ -254,7 +248,7 @@ export default function EditProfile() {
                         }}
                     />
                 </View>
-                {errors.display_status && <Text className="text-red-500">{errors.display_status}</Text>}
+                {errors.display_status && <Text className="text-red-500 pl-[4%] pb-[2%]">{errors.display_status}</Text>}
 
                 {/* Gender */}
                 <ProfileFormInputLabel inputLabel='GENDER'/>
@@ -276,20 +270,114 @@ export default function EditProfile() {
                         }}
                     />
                 </View>
-                {errors.gender && <Text className="text-red-500">{errors.gender}</Text>}
+                {errors.gender && <Text className="text-red-500 pl-[4%] pb-[2%]">{errors.gender}</Text>}
 
                 {/* Sexual orientation */}
                 <ProfileFormInputLabel inputLabel='SEXUAL ORIENTATION'/>
                 <ProfileInputRadioButton setValues={setValues} />
-                {errors.sexual_orientation && <Text className="text-red-500">{errors.sexual_orientation}</Text>}
-
+                {errors.sexual_orientation && <Text className="text-red-500 pl-[4%] pb-[2%]">{errors.sexual_orientation}</Text>}
                 
-                <View className="w-[95%] self-center pt-[5%]">
-                    <AuthButton btnAction={() => handleSubmit(values)} btnText={"Save"} />
-                </View>
+                {/* Job Title */}
+                <ProfileFormInputLabel inputLabel='JOB TITLE'/>
+                <ProfileFormInputField 
+                    iconName = {""}
+                    placeholderText = {"Frontend developer / iOS developer / Fullstack developer / Data scientist ..."}
+                    placeholderTextColor = {"#666666"}
+                    autoCorrect ={false}
+                    secureTextEntry = {false}
+                    onChangeText= {(val) => {
+                        setValues(prev => {
+                            return ({...prev, job_title: val})
+                        })}}
+                    onBlur = {() => handleBlur('job_title')}
+                    autoCapitalize = {"none"}
+                    value = { values.job_title || currentUserDetails?.job_title }
+                    multiline = {true}
+                    height={40}
+                />
+                {touched.job_title && errors.job_title && <Text className="text-red-500 pl-[4%] pb-[2%]">{errors.job_title}</Text>}
+
+
+                {/* Skills */}
+                <ProfileFormInputLabel inputLabel='SKILLS'/>
+                <ProfileFormInputField 
+                    iconName = {""}
+                    placeholderText = {"react, javascript, web frontend, mobile, typescript, java..."}
+                    placeholderTextColor = {"#666666"}
+                    autoCorrect ={false}
+                    secureTextEntry = {false}
+                    onChangeText= {(val) => {
+                        setValues(prev => {
+                            return ({...prev, skills: val})
+                        })}}
+                    onBlur = {() => handleBlur('skills')}
+                    autoCapitalize = {"none"}
+                    value = { values.skills || currentUserDetails?.skills }
+                    multiline = {true}
+                    height={60}
+                />
+                {touched.skills && errors.skills && <Text className="text-red-500 pl-[4%] pb-[2%]">{errors.skills}</Text>}
+
+                 {/* countries travelled */}
+                <ProfileFormInputLabel inputLabel='COUNTRIES TRAVELLED'/>
+                <ProfileFormInputField 
+                    iconName = {""}
+                    placeholderText = {"UK, Spain, Germany, France, China, USA..."}
+                    placeholderTextColor = {"#666666"}
+                    autoCorrect ={false}
+                    secureTextEntry = {false}
+                    onChangeText= {(val) => {
+                        setValues(prev => {
+                            return ({...prev, countries_travelled: val})
+                        })}}
+                    onBlur = {() => handleBlur('countries_travelled')}
+                    autoCapitalize = {"none"}
+                    value = { values.countries_travelled || currentUserDetails?.countries_travelled }
+                    multiline = {true}
+                    height={60}
+                />
+                {touched.countries_travelled && errors.countries_travelled && <Text className="text-red-500 pl-[4%] pb-[2%]">{errors.countries_travelled}</Text>}
+                
+                {/* countries lived */}
+                <ProfileFormInputLabel inputLabel='COUNTRIES LIVED'/>
+                <ProfileFormInputField 
+                    iconName = {""}
+                    placeholderText = {"UK, USA, Canada, Germany..."}
+                    placeholderTextColor = {"#666666"}
+                    autoCorrect ={false}
+                    secureTextEntry = {false}
+                    onChangeText= {(val) => {
+                        setValues(prev => {
+                            return ({...prev, countries_lived: val})
+                        })}}
+                    onBlur = {() => handleBlur('countries_travelled')}
+                    autoCapitalize = {"none"}
+                    value = { values.countries_lived || currentUserDetails?.countries_lived }
+                    multiline = {true}
+                    height={60}
+                />
+                {touched.countries_lived && errors.countries_lived && <Text className="text-red-500 pl-[4%] pb-[2%]">{errors.countries_lived}</Text>}
+                
+                {/* favourite city */}
+                <ProfileFormInputLabel inputLabel='FAVOURITE CITIES'/>
+                <ProfileFormInputField 
+                    iconName = {""}
+                    placeholderText = {"London, Barcelona, Berlin, Paris, New York..."}
+                    placeholderTextColor = {"#666666"}
+                    autoCorrect ={false}
+                    secureTextEntry = {false}
+                    onChangeText= {(val) => {
+                        setValues(prev => {
+                            return ({...prev, favourite_cities: val})
+                        })}}
+                    onBlur = {() => handleBlur('favourite_cities')}
+                    autoCapitalize = {"none"}
+                    value = { values.favourite_cities || currentUserDetails?.favourite_cities }
+                    multiline = {true}
+                    height={60}
+                />
+                {touched.favourite_cities && errors.favourite_cities && <Text className="text-red-500 pl-[4%] pb-[2%]">{errors.favourite_cities}</Text>}
                
-            </>)}
-            </Formik> 
         </View>
     </KeyboardAwareScrollView>
     <Footer screen="Profile"/>

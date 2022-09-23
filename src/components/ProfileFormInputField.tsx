@@ -16,8 +16,8 @@ interface ProfileFormInputFieldProps {
     textContentType?: string;
     clearTextOnFocus?: boolean;
     secureTextEntry?: boolean;
-    onChangeText?: () => {};
-    onBlur?: () => {};
+    onChangeText?: () => void;
+    onBlur?: () => void;
     autoFocus?: boolean ;
     autoCapitalize?: string,
     value: string | number;
