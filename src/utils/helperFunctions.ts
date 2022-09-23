@@ -1,4 +1,5 @@
-import { getStorage, ref, uploadBytes } from "firebase/storage";
+// @ts-nocheck
+import { getStorage, ref, uploadBytes, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 import 'firebase/compat/storage'
 
 export const CapFirstCharacter = (str:string) => {
@@ -15,8 +16,12 @@ export const uploadImageToFirestore = async (imgURL) => {
     const filename= imgURL.substring(imgURL.lastIndexOf('/')+1);
     const storageRef = ref(storage, filename)
     try {
-        uploadBytes(storageRef, bytes).then(snapshot => console.log('upload image successful'))
+        await uploadBytes(storageRef, bytes).then(snapshot => console.log('upload image successful'))
+        const uploadTask = uploadBytesResumable(storageRef, filename)
+        const url = await getDownloadURL(uploadTask.snapshot.ref)
+        return url
     } catch (error) {
         console.log(error)
     }   
 }
+

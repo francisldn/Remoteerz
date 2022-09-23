@@ -102,9 +102,13 @@ export default function EditProfile({route}) {
             });
             if (!result.cancelled) {
                 setImage(result.uri);
-                await uploadImageToFirestore(result.uri);
+                const url = await uploadImageToFirestore(result.uri)
+                console.log(url)
+                const imageData = {image: url}
+                await updateCurrentUserDetails(imageData)
+                    .then(() => console.log('image successfully updated'))
+                    .catch((error) => console.log(error))
                 setIsOpen(false)
-                return
             }
         } catch (error) {
             console.log(error)
