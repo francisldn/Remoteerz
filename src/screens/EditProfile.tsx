@@ -20,6 +20,7 @@ import ProfileInputAgePicker from '../components/ProfileInputAgePicker';
 import { CapFirstCharacter } from '../utils/helperFunctions';
 import BottomSheet, {BottomSheetView, useBottomSheetSpringConfigs} from '@gorhom/bottom-sheet';
 import * as ImagePicker from 'expo-image-picker';
+import { uploadImageToFirestore } from '../utils/helperFunctions';
 
 const placeholderImageURL = "https://firebasestorage.googleapis.com/v0/b/remoteers-360d0.appspot.com/o/icons8-selfies-100.png?alt=media&token=da1fef51-7ede-4f32-a559-1270ba1fe95f"
 
@@ -101,12 +102,13 @@ export default function EditProfile({route}) {
             });
             if (!result.cancelled) {
                 setImage(result.uri);
+                await uploadImageToFirestore(result.uri);
                 setIsOpen(false)
                 return
             }
         } catch (error) {
             console.log(error)
-            Alert.alert('Error in launching camera. Please try again.')
+            Alert.alert('Error in accessing album. Please try again.')
         }
 
     };
