@@ -11,7 +11,8 @@ import {
 } from 'firebase/auth';
 import {db} from './firebase/firebaseConfig';
 import {auth} from './firebase/firebaseConfig';
-import { doc, setDoc} from 'firebase/firestore';
+import { doc, setDoc, getDoc} from 'firebase/firestore';
+
 
 // interface AuthProps {
 //     user:User,
@@ -38,6 +39,7 @@ export const AuthProvider = ({children}) => {
     const [loading, setLoading] = useState(false)
     const [initialLoading, setInitialLoading] = useState(true)
     // firebase user
+    const [currentUserDetails, setCurrentUserDetails] = useState(null)
     const [currentUser, setCurrentUser] = useState(null) 
     const [error, setError] = useState('')
 
@@ -99,6 +101,13 @@ export const AuthProvider = ({children}) => {
                 .catch((error) => {throw new Error(error)})
             })
 
+            // retrieve user data from database
+            getCurrentUserDetails(auth.currentUser.uid)
+            .then(data => {
+                setCurrentUserDetails(data)
+            })
+            .catch(error => {throw new Error(error)})
+
         } catch (error) {
             if(error.code.includes("email-already-in-use")) {
                 setError('This email has been registered before.')
@@ -117,7 +126,14 @@ export const AuthProvider = ({children}) => {
         setLoading(true)
         try {
             await signInWithEmailAndPassword(auth, email, password);
-            setUser(auth.currentUser)
+            setCurrentUser(auth.currentUser)
+            // get user data from Firestore
+            getCurrentUserDetails(auth.currentUser.uid)
+            .then(data => {
+                setCurrentUserDetails(data)
+            })
+            .catch(error => {throw new Error(error)})
+
         } catch (error) {
             if(error.code.includes("wrong-password")) {
                 setError('Wrong password.')
@@ -135,7 +151,7 @@ export const AuthProvider = ({children}) => {
         setLoading(true)
         try {
             await signOut(auth).then(() => {
-                setUser(null)
+                setCurrentUser(null)
             });
         } catch (error) {
             console.log('error logging out: ', error);
@@ -161,6 +177,13 @@ export const AuthProvider = ({children}) => {
         setLoading(false)
     }
     
+    const getCurrentUserDetails = async (id) => {
+        const docRef = doc(db,"Users",id)
+        const userDetails = (await getDoc(docRef)).data();
+        return userDetails;
+    }
+
+    const updateCurrentUserDetails = async (email) => {}
     // more performant
     // similar to useEffect but only re-compute if one of the dependencies changes
     const memoedValue = useMemo(() => ({
@@ -172,8 +195,9 @@ export const AuthProvider = ({children}) => {
         logout,
         error,
         forgotPassword,
-        setLoading
-    }), [currentUser,initialLoading,loading,error])
+        setLoading,
+        currentUserDetails
+    }), [currentUserDetails,initialLoading,loading,error])
 
 
     return (

@@ -47,7 +47,6 @@ export default function ForgotPasswordForm() {
                   placeholderTextColor="#666666" 
                   autoCorrect={false} 
                   keyboardType={'email-address'}
-                  clearTextOnFocus={true}
                   secureTextEntry={false}
                   onChangeText={handleChange('email')}
                   onBlur={handleBlur('email')}

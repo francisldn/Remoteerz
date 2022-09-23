@@ -33,7 +33,7 @@ const SettingList = ({
             <View className="flex flex-row flex-1 justify-between">
                 <View className="flex flex-row flex-3">
                     <View className="flex self-center justify-self-center pl-3">
-                        <MaterialIcons name={iconName} color={colors.text} size={30}/>
+                        <MaterialIcons name={iconName} color={"#4136e5"} size={30}/>
                     </View>
                     <View className="flex self-center justify-self-center pl-5">
                         <Text  

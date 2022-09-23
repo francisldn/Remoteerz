@@ -8,6 +8,7 @@ import { Formik } from 'formik';
 import * as yup from 'yup';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../utils/useAuth';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 export default function SignUpForm() {
   const {signUp, loading, setLoading} = useAuth() 
@@ -24,9 +25,11 @@ export default function SignUpForm() {
     const navigation = useNavigation()
 
   return (
-    <ScrollView>
+    <KeyboardAwareScrollView
+      extraScrollHeight={20}
+      keyboardOpeningTime={200}
+    >
       <View className="flex justify-center align-middle mx-[8%] pt-[40%]">
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View>
         <Formik
             initialValues={{email: '', password:'', confirmPassword: ''}}
@@ -56,7 +59,6 @@ export default function SignUpForm() {
                   placeholderTextColor="#666666" 
                   autoCorrect={false} 
                   keyboardType={'email-address'}
-                  clearTextOnFocus={true}
                   secureTextEntry={false}
                   onChangeText={handleChange('email')}
                   onBlur={handleBlur('email')}
@@ -71,7 +73,6 @@ export default function SignUpForm() {
                   placeholderTextColor="#666666" 
                   autoCorrect={false} 
                   textContentType={'newPassword'} 
-                  clearTextOnFocus={true}
                   secureTextEntry={true}
                   onChangeText={handleChange('password')}
                   onBlur={handleBlur('password')}
@@ -86,7 +87,6 @@ export default function SignUpForm() {
                   placeholderTextColor="#666666" 
                   autoCorrect={false} 
                   textContentType={'password'}
-                  clearTextOnFocus={true}
                   secureTextEntry={true}
                   onChangeText={handleChange('confirmPassword')}
                   onBlur={handleBlur('confirmPassword')}
@@ -101,8 +101,7 @@ export default function SignUpForm() {
               </>)}
         </Formik>
         </View>
-      </TouchableWithoutFeedback>
       </View>
-    </ScrollView>
+    </KeyboardAwareScrollView>
   )
 }

@@ -13,6 +13,7 @@ import Hangouts from './src/screens/Hangouts';
 import Chatroom from './src/screens/Chatroom';
 import EditProfile from './src/screens/EditProfile';
 import PreviewProfile from './src/screens/PreviewProfile';
+import Logout from './src/screens/Logout';
 import { AuthProvider } from './src/utils/useAuth';
 import AccountSettings from './src/screens/AccountSettings';
 
@@ -27,6 +28,10 @@ export default function App() {
             {/* <Stack.Screen
               name="Login"
               component={Login}
+            />
+            <Stack.Screen
+              name="Logout"
+              component={Logout}
             />
             <Stack.Screen
               name="SignUp"
@@ -50,7 +55,6 @@ export default function App() {
               name="ForgotPassword"
               component={ForgotPassword}
             /> */}
-
           <Stack.Screen
               name="Profile"
               component={Profile}
@@ -79,6 +83,9 @@ export default function App() {
           <Stack.Screen
             name="EditProfile"
             component={EditProfile}
+            options= {() => ({
+              title:"",
+            })}
           />
            <Stack.Screen
             name="PreviewProfile"

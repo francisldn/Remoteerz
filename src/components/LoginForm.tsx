@@ -8,6 +8,7 @@ import {useNavigation} from '@react-navigation/native';
 import * as yup from 'yup';
 import { Formik } from 'formik';
 import { useAuth } from '../utils/useAuth';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 export default function LoginForm() {
     const {login, loading, setLoading} = useAuth();
@@ -20,11 +21,14 @@ export default function LoginForm() {
   })
 
   return (
+    <KeyboardAwareScrollView
+      extraScrollHeight={20}
+      keyboardOpeningTime={200}
+    >
     <View
       className="flex justify-center align-middle mx-[8%] pt-[45%]"
       >
       {/* To dismiss keyboard if touch outside the input field */}
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View>
           <Formik
             initialValues={{email: '', password: ''}}
@@ -55,7 +59,6 @@ export default function LoginForm() {
                     autoCorrect={false} 
                     keyboardType={'email-address'} 
                     textContentType={'emailAddress'}
-                    clearTextOnFocus={true}
                     secureTextEntry={false}
                     onChangeText={handleChange('email')}
                     onBlur={handleBlur('email')}
@@ -70,7 +73,6 @@ export default function LoginForm() {
                   placeholderTextColor="#666666" 
                   autoCorrect={false} 
                   textContentType={'password'}
-                  clearTextOnFocus={true}
                   secureTextEntry={true}
                   onChangeText={handleChange('password')}
                   onBlur={handleBlur('password')}
@@ -99,7 +101,7 @@ export default function LoginForm() {
             </Pressable>
 
         </View>
-      </TouchableWithoutFeedback>
     </View>
+    </KeyboardAwareScrollView>
   )
 }

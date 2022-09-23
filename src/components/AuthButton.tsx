@@ -7,7 +7,6 @@ interface AuthButtonProps {
 }
 
 const AuthButton = ({btnText, btnAction}: AuthButtonProps) => {
-    const pressHandler= () => {}
     return (
         <View className="w-full">
         <Pressable style={({ pressed }) => [

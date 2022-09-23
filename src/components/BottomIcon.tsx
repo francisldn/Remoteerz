@@ -14,7 +14,7 @@ interface BottomIconProps {
 export default function BottomIcon({iconName, text, textMarginLeft, pressHandler,iconMarginLeft, iconColor}:BottomIconProps) {
 
   return (
-    <View className="py-[3%]">
+    <View className="pb-[3%] self-center">
         <Pressable 
             onPress={pressHandler}
             >

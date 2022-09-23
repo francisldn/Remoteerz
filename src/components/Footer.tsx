@@ -7,7 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 export default function Footer({screen}) {
     const navigation = useNavigation()
   return (
-    <SafeAreaView className="flex flex-row justify-around bg-white h-[12%]">
+    <View className="flex flex-row justify-around bg-white h-[12%]">
         {screen === 'Dashboard'
             ? <BottomIcon iconName="dashboard" text="Dashboard" iconMarginLeft={7} pressHandler={() => navigation.navigate('Dashboard')} iconColor={true}/>
             : <BottomIcon iconName="dashboard" text="Dashboard" iconMarginLeft={7} pressHandler={() => navigation.navigate('Dashboard')} />}
@@ -20,6 +20,6 @@ export default function Footer({screen}) {
         {screen === 'Profile' 
             ? <BottomIcon iconName="person" text="Profile" textMarginLeft={5}  pressHandler={() => navigation.navigate('Profile')} iconColor={true}/>
             : <BottomIcon iconName="person" text="Profile" textMarginLeft={5}  pressHandler={() => navigation.navigate('Profile')} />}
-    </SafeAreaView>
+    </View>
   )
 }
