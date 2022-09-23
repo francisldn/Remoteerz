@@ -1,6 +1,6 @@
 // @ts-nocheck
-import { View, Text, Pressable } from 'react-native'
-import React, {useState} from 'react'
+import { View, Text, Alert,  } from 'react-native'
+import React, {useState, useEffect} from 'react'
 import Footer from '../components/Footer';
 import GlobalStyles from '../utils/GlobalStyles'
 import Avatar from '../components/Avatar';
@@ -9,7 +9,7 @@ import { TouchableRipple } from 'react-native-paper';
 import { useAuth } from '../utils/useAuth';
 import { SimpleLineIcons } from '@expo/vector-icons';
 import ProfileFormInputField from '../components/ProfileFormInputField';
-import { Formik, useFormik} from 'formik';
+import { useFormik} from 'formik';
 import * as yup from 'yup';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import ButtonToggleGroup from 'react-native-button-toggle-group';
@@ -20,11 +20,10 @@ import ProfileInputAgePicker from '../components/ProfileInputAgePicker';
 
 
 export default function EditProfile() {
-  const {currentUserDetails, loading} = useAuth()
+  const {currentUserDetails, loading, updateCurrentUserDetails} = useAuth()
   const navigation = useNavigation()
-  const [displayValue, setDisplayValue] = useState("Public");
-  const [genderValue, setGenderValue] = useState('Male')
-
+  const [displayValue, setDisplayValue] = useState(currentUserDetails?.display_status.charAt(0).toUpperCase() + currentUserDetails.display_status.slice(1) || 'Public');
+  const [genderValue, setGenderValue] = useState(currentUserDetails?.gender.charAt(0).toUpperCase() + currentUserDetails.gender.slice(1) || 'Public');
 
   const ProfileSchema = yup.object().shape({
     username: yup
@@ -86,7 +85,7 @@ export default function EditProfile() {
         .optional()
 })
 
-  const {handleSubmit, handleBlur, errors, setValues, values, handleChange, touched} = useFormik({
+  const {handleSubmit, handleBlur, errors, setValues, values, touched} = useFormik({
     initialValues: {
         username: currentUserDetails?.username || '',
         about: currentUserDetails?.about || '',
@@ -103,10 +102,10 @@ export default function EditProfile() {
 
     },
     validationSchema: ProfileSchema,
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
         try {
             console.log(values)
-            //submit the form
+            await updateCurrentUserDetails(values);
         } catch(error) {
             Alert.alert("Not saved.")
         }
@@ -181,7 +180,7 @@ export default function EditProfile() {
                         })}}
                     onBlur = {() => handleBlur('username')}
                     autoCapitalize = {"none"}
-                    value = { values.username || currentUserDetails?.username }
+                    value = {currentUserDetails?.username  || values.username }
                     multiline = {false}
                 />
                 {touched.username && errors.username && <Text className="text-red-500 pl-[4%] pb-[2%]">{errors.username}</Text>}
@@ -199,7 +198,7 @@ export default function EditProfile() {
                         })}}
                     onBlur = {() => handleBlur('about')}
                     autoCapitalize = {"none"}
-                    value = { values.about || currentUserDetails?.about }
+                    value = { currentUserDetails?.about || values.about }
                     multiline = {true}
                     height={100}
                 />
@@ -207,7 +206,7 @@ export default function EditProfile() {
 
                 {/* Age*/}
                 <ProfileFormInputLabel inputLabel='AGE'/>
-                <ProfileInputAgePicker setValues={setValues} />
+                <ProfileInputAgePicker setValues={setValues} defaultAge={currentUserDetails.age}/>
                 {errors.age && <Text className="text-red-500">{errors.age}</Text>}
 
                 {/* Interests */}
@@ -224,7 +223,7 @@ export default function EditProfile() {
                         })}}
                     onBlur = {() => handleBlur('interests')}
                     autoCapitalize = {"none"}
-                    value = { values.interests || currentUserDetails?.interests }
+                    value = { currentUserDetails?.interests || values.interests }
                     multiline = {true}
                     height={60}
                 />
@@ -241,7 +240,7 @@ export default function EditProfile() {
                         inactiveBackgroundColor={'transparent'}
                         inactiveTextColor={'grey'}
                         values={['Public', 'Private']}
-                        value={displayValue}
+                        value={displayValue }
                         onSelect={val => {
                             setDisplayValue(val)
                             setValues(prev => {
@@ -263,7 +262,7 @@ export default function EditProfile() {
                         inactiveBackgroundColor={'transparent'}
                         inactiveTextColor={'grey'}
                         values={['Male', 'Female', 'Other']}
-                        value={genderValue}
+                        value={ genderValue}
                         onSelect={val => {
                             setGenderValue(val)
                             setValues(prev => {
@@ -276,7 +275,7 @@ export default function EditProfile() {
 
                 {/* Sexual orientation */}
                 <ProfileFormInputLabel inputLabel='SEXUAL ORIENTATION'/>
-                <ProfileInputRadioButton setValues={setValues} />
+                <ProfileInputRadioButton setValues={setValues} defaultValue={currentUserDetails.sexual_orientation.charAt(0).toUpperCase() + currentUserDetails.sexual_orientation.slice(1) || 'Straight'}/>
                 {errors.sexual_orientation && <Text className="text-red-500 pl-[4%] pb-[2%]">{errors.sexual_orientation}</Text>}
                 
                 {/* Job Title */}
@@ -293,7 +292,7 @@ export default function EditProfile() {
                         })}}
                     onBlur = {() => handleBlur('job_title')}
                     autoCapitalize = {"none"}
-                    value = { values.job_title || currentUserDetails?.job_title }
+                    value = { currentUserDetails?.job_title  || values.job_title }
                     multiline = {true}
                     height={40}
                 />
@@ -314,7 +313,7 @@ export default function EditProfile() {
                         })}}
                     onBlur = {() => handleBlur('skills')}
                     autoCapitalize = {"none"}
-                    value = { values.skills || currentUserDetails?.skills }
+                    value = {currentUserDetails?.skills || values.skills }
                     multiline = {true}
                     height={60}
                 />
@@ -334,7 +333,7 @@ export default function EditProfile() {
                         })}}
                     onBlur = {() => handleBlur('countries_travelled')}
                     autoCapitalize = {"none"}
-                    value = { values.countries_travelled || currentUserDetails?.countries_travelled }
+                    value = {currentUserDetails?.countries_travelled  || values.countries_travelled}
                     multiline = {true}
                     height={60}
                 />
@@ -354,7 +353,7 @@ export default function EditProfile() {
                         })}}
                     onBlur = {() => handleBlur('countries_travelled')}
                     autoCapitalize = {"none"}
-                    value = { values.countries_lived || currentUserDetails?.countries_lived }
+                    value = { currentUserDetails?.countries_lived || values.countries_lived }
                     multiline = {true}
                     height={60}
                 />
@@ -374,7 +373,7 @@ export default function EditProfile() {
                         })}}
                     onBlur = {() => handleBlur('favourite_cities')}
                     autoCapitalize = {"none"}
-                    value = { values.favourite_cities || currentUserDetails?.favourite_cities }
+                    value = {currentUserDetails?.favourite_cities || values.favourite_cities }
                     multiline = {true}
                     height={60}
                 />

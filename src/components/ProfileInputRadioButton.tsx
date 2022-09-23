@@ -4,8 +4,8 @@ import React,{useState} from 'react'
 import RadioButtonGroup, { RadioButtonItem } from "expo-radio-button";
 import GlobalStyles from '../utils/GlobalStyles';
 
-export default function ProfileInputRadioButton({setValues}) {
-    const [current, setCurrent] = useState('Straight')
+export default function ProfileInputRadioButton({setValues, defaultValue}) {
+    const [current, setCurrent] = useState(defaultValue)
     return (
         <View style={[styles.radioBtn]}>
             <RadioButtonGroup
@@ -14,7 +14,7 @@ export default function ProfileInputRadioButton({setValues}) {
                 onSelected={(value) => {
                     setCurrent(value)
                     setValues(prev => {
-                        return ({...prev, sexual_orientation: current.toLowerCase()})
+                        return ({...prev, sexual_orientation: value.toLowerCase()})
                      })
                 }}
                 radioBackground="#4136e5"            

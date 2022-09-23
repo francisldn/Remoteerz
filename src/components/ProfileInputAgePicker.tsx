@@ -3,8 +3,8 @@ import React, { useState } from 'react'
 import {Picker} from '@react-native-picker/picker';
 import { StyleSheet } from 'react-native';
 
-export default function ProfileInputAgePicker({setValues}){
-  const [age, setAge] = useState('16')
+export default function ProfileInputAgePicker({setValues, defaultAge}){
+  const [age, setAge] = useState(defaultAge)
   // to convert into string because Picker can only handle string
   const ageArray = [...Array(100).keys()].map(i=> (i+16).toString());
 

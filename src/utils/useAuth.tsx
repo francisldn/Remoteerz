@@ -11,9 +11,8 @@ import {
 } from 'firebase/auth';
 import {db} from './firebase/firebaseConfig';
 import {auth} from './firebase/firebaseConfig';
-import { doc, setDoc, getDoc} from 'firebase/firestore';
-
-
+import { doc, getDoc, setDoc} from 'firebase/firestore';
+import {getCurrentLocation} from './useLocation'    
 // interface AuthProps {
 //     user:User,
 //     signUp: () => {},
@@ -42,6 +41,7 @@ export const AuthProvider = ({children}) => {
     const [currentUserDetails, setCurrentUserDetails] = useState(null)
     const [currentUser, setCurrentUser] = useState(null) 
     const [error, setError] = useState('')
+    const [userLocation, setUserLocation] = useState('')
 
     useEffect(() => {
         // redirect user to login page if user is not signed up
@@ -56,6 +56,32 @@ export const AuthProvider = ({children}) => {
         return unsubscribe;
     }, [auth])
 
+    useEffect(() => {
+        (async() => {
+            try {
+                const data = await getCurrentLocation()
+                setUserLocation(data)
+                await updateCurrentUserDetails(data)
+                console.log('user location updated successfully')
+            } catch (error) {
+                console.log('failed to update user location')
+                console.log(error)
+            }
+        })()
+    },[auth])
+
+    useEffect(() => {
+        (async() => {
+            try {
+                const data = await getCurrentUserDetails()
+                setCurrentUserDetails(data)
+                console.log("user data retrieved successfully")
+            }catch (error) {
+                console.log('failed to retrieve user data')
+                console.log(error)
+            }
+        })()
+    },[auth])
 
     // sign up with email and password
     const signUp = async (email, password) => {
@@ -88,11 +114,6 @@ export const AuthProvider = ({children}) => {
                     last_destination: null,
                     next_destination: null,
                     phone_number:null,
-                    location: {
-                        location_name: '',
-                        latitude:'',
-                        longitude:''
-                    },
                     myEvents:[],
                     myFriends:[],
                     chatrooms:[],
@@ -100,13 +121,7 @@ export const AuthProvider = ({children}) => {
                 .then(() => {console.log('successful')})
                 .catch((error) => {throw new Error(error)})
             })
-
-            // retrieve user data from database
-            getCurrentUserDetails(auth.currentUser.uid)
-            .then(data => {
-                setCurrentUserDetails(data)
-            })
-            .catch(error => {throw new Error(error)})
+            
 
         } catch (error) {
             if(error.code.includes("email-already-in-use")) {
@@ -127,13 +142,6 @@ export const AuthProvider = ({children}) => {
         try {
             await signInWithEmailAndPassword(auth, email, password);
             setCurrentUser(auth.currentUser)
-            // get user data from Firestore
-            getCurrentUserDetails(auth.currentUser.uid)
-            .then(data => {
-                setCurrentUserDetails(data)
-            })
-            .catch(error => {throw new Error(error)})
-
         } catch (error) {
             if(error.code.includes("wrong-password")) {
                 setError('Wrong password.')
@@ -143,6 +151,7 @@ export const AuthProvider = ({children}) => {
             setLoading(false)
             throw new Error(error.code)
         }
+
         setLoading(false);
     }
 
@@ -177,17 +186,33 @@ export const AuthProvider = ({children}) => {
         setLoading(false)
     }
     
-    const getCurrentUserDetails = async (id) => {
+    const getCurrentUserDetails = async () => {
+        const id = auth.currentUser.uid
         const docRef = doc(db,"Users",id)
-        const userDetails = (await getDoc(docRef)).data();
-        return userDetails;
+        try {
+            const userDetails = await getDoc(docRef)
+            return userDetails.data();
+        } catch (error) {
+            console.log(error)
+            throw new Error(error)
+        }
     }
 
-    const updateCurrentUserDetails = async (uid, userData) => {
-        const docRef = doc(db,"Users",id)
-        collection
-
+    const updateCurrentUserDetails = async (userData) => {
+        const id = auth.currentUser.uid
+        if(id) {
+            const docRef = doc(db,"Users",id)
+            try {
+                await setDoc(docRef, userData, {merge:true})
+            } catch (error) {
+                console.log(error)
+                throw new Error(error)
+            }
+        } else {
+            console.log('user id undefined')
+        }
     }
+
     // more performant
     // similar to useEffect but only re-compute if one of the dependencies changes
     const memoedValue = useMemo(() => ({
@@ -200,8 +225,10 @@ export const AuthProvider = ({children}) => {
         error,
         forgotPassword,
         setLoading,
-        currentUserDetails
-    }), [currentUserDetails,initialLoading,loading,error])
+        currentUserDetails,
+        updateCurrentUserDetails,
+        userLocation
+    }), [currentUserDetails,initialLoading,loading,error, userLocation])
 
 
     return (

@@ -25,7 +25,7 @@ export default function App() {
     <AuthProvider>
       <NavigationContainer>
         <Stack.Navigator>
-            {/* <Stack.Screen
+            <Stack.Screen
               name="Login"
               component={Login}
             />
@@ -54,7 +54,7 @@ export default function App() {
           <Stack.Screen
               name="ForgotPassword"
               component={ForgotPassword}
-            /> */}
+            />
           <Stack.Screen
               name="Profile"
               component={Profile}
