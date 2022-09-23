@@ -15,6 +15,7 @@ import EditProfile from './src/screens/EditProfile';
 import PreviewProfile from './src/screens/PreviewProfile';
 import Logout from './src/screens/Logout';
 import { AuthProvider } from './src/utils/useAuth';
+import { LocationProvider } from './src/utils/useLocation';
 import AccountSettings from './src/screens/AccountSettings';
 
 const Stack = createNativeStackNavigator();
@@ -23,6 +24,7 @@ export default function App() {
   return (
     <>
     <AuthProvider>
+      <LocationProvider>
       <NavigationContainer>
         <Stack.Navigator>
             <Stack.Screen
@@ -90,6 +92,9 @@ export default function App() {
            <Stack.Screen
             name="PreviewProfile"
             component={PreviewProfile}
+            options= {() => ({
+              title:"Preview Profile",
+            })}
           />
           <Stack.Screen
             name="AccountSettings"
@@ -97,6 +102,7 @@ export default function App() {
           />
         </Stack.Navigator>
       </NavigationContainer>
+      </LocationProvider>
       </AuthProvider>
     </>
   );

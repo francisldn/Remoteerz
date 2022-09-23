@@ -43,6 +43,7 @@ export const AuthProvider = ({children}) => {
     const [error, setError] = useState('')
     const [userLocation, setUserLocation] = useState('')
 
+    // get user auth when user signs up
     useEffect(() => {
         // redirect user to login page if user is not signed up
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -56,12 +57,14 @@ export const AuthProvider = ({children}) => {
         return unsubscribe;
     }, [auth])
 
+    // retrieve user location and update in database
     useEffect(() => {
         (async() => {
             try {
                 const data = await getCurrentLocation()
                 setUserLocation(data)
                 await updateCurrentUserDetails(data)
+                await updateUserOnlineStatus();
                 console.log('user location updated successfully')
             } catch (error) {
                 console.log('failed to update user location')
@@ -70,6 +73,7 @@ export const AuthProvider = ({children}) => {
         })()
     },[auth])
 
+    // retrieve user details from database - to display
     useEffect(() => {
         (async() => {
             try {
@@ -158,10 +162,12 @@ export const AuthProvider = ({children}) => {
     //sign out 
     const logout = async() => {
         setLoading(true)
+        const id = auth.currentUser.uid
         try {
             await signOut(auth).then(() => {
                 setCurrentUser(null)
             });
+            await updateUserOfflineStatus(id);
         } catch (error) {
             console.log('error logging out: ', error);
             setError(error.message)
@@ -197,6 +203,34 @@ export const AuthProvider = ({children}) => {
             throw new Error(error)
         }
     }
+    const updateUserOnlineStatus = async () => {
+        const id = auth.currentUser.uid
+        if(id) {
+            const docRef = doc(db,"Users",id)
+            try {
+                await setDoc(docRef, {online: true}, {merge:true})
+            } catch (error) {
+                console.log(error)
+                throw new Error(error)
+            }
+        } else {
+            console.log('user id undefined')
+        }
+    }
+
+    const updateUserOfflineStatus = async (id) => {
+        if(id) {
+            const docRef = doc(db,"Users",id)
+            try {
+                await setDoc(docRef, {online: false}, {merge:true})
+            } catch (error) {
+                console.log(error)
+                throw new Error(error)
+            }
+        } else {
+            console.log('user id undefined')
+        }
+    }
 
     const updateCurrentUserDetails = async (userData) => {
         const id = auth.currentUser.uid
@@ -227,6 +261,7 @@ export const AuthProvider = ({children}) => {
         setLoading,
         currentUserDetails,
         updateCurrentUserDetails,
+        getCurrentUserDetails,
         userLocation
     }), [currentUserDetails,initialLoading,loading,error, userLocation])
 

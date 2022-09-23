@@ -1,6 +1,6 @@
 // @ts-nocheck
-import { View, Text, Alert,  } from 'react-native'
-import React, {useState, useEffect} from 'react'
+import { View, Text, Alert  } from 'react-native'
+import React, {useState, useEffect, useRef, useCallback} from 'react'
 import Footer from '../components/Footer';
 import GlobalStyles from '../utils/GlobalStyles'
 import Avatar from '../components/Avatar';
@@ -17,13 +17,104 @@ import AuthButton from '../components/AuthButton';
 import ProfileFormInputLabel from '../components/ProfileFormInputLabel';
 import ProfileInputRadioButton from '../components/ProfileInputRadioButton';
 import ProfileInputAgePicker from '../components/ProfileInputAgePicker';
+import { CapFirstCharacter } from '../utils/helperFunctions';
+import BottomSheet, {BottomSheetView, useBottomSheetSpringConfigs} from '@gorhom/bottom-sheet';
+import * as ImagePicker from 'expo-image-picker';
 
+const placeholderImageURL = "https://firebasestorage.googleapis.com/v0/b/remoteers-360d0.appspot.com/o/icons8-selfies-100.png?alt=media&token=da1fef51-7ede-4f32-a559-1270ba1fe95f"
 
-export default function EditProfile() {
-  const {currentUserDetails, loading, updateCurrentUserDetails} = useAuth()
+export default function EditProfile({route}) {
+  const {currentUserDetails, loading, updateCurrentUserDetails, getCurrentUserDetails} = useAuth()
+  const [userData, setUserData] = useState(currentUserDetails || route.params)
   const navigation = useNavigation()
-  const [displayValue, setDisplayValue] = useState(currentUserDetails?.display_status.charAt(0).toUpperCase() + currentUserDetails.display_status.slice(1) || 'Public');
-  const [genderValue, setGenderValue] = useState(currentUserDetails?.gender.charAt(0).toUpperCase() + currentUserDetails.gender.slice(1) || 'Public');
+  const [displayValue, setDisplayValue] = useState(CapFirstCharacter(userData.display_status) || 'Public' );
+  const [genderValue, setGenderValue] = useState(CapFirstCharacter(userData.gender)|| 'Male');
+  const [image, setImage] = useState(placeholderImageURL)
+  const [isOpen, setIsOpen] = useState(false);
+
+  // get user details
+  useEffect(() => {
+    if(!currentUserDetails) {
+        try{
+            getCurrentUserDetails().then(data => setUserData(data));
+        } catch (error) {
+            console.log(error)
+        }
+    }
+  },[currentUserDetails])
+
+  // snapPoints for bottomsheet
+  const snapPoints = ['35%']
+
+  const sheetRef = useRef(null)
+
+  const animationConfigs = useBottomSheetSpringConfigs({
+        overshootClamping: true,
+    });
+
+  const handleSnapPress = useCallback((index) => {
+        if(sheetRef.current) sheetRef.current.snapToIndex(index);
+        setIsOpen(true)
+    },[])
+
+  const accessCamera = async () => {
+        const { status } = await ImagePicker.requestCameraPermissionsAsync();
+        if (status !== 'granted') {
+            setErrorMsg('Permission to access camera was denied');
+            return;
+        }
+        try {
+            let result = await ImagePicker.launchCameraAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                aspect: [4, 3],
+                quality: 0,
+                allowsMultipleSelection: false,
+            }).then(res => res.allowsMultipleSelection = false)
+            
+            if (!result.cancelled) {
+                setImage(result.uri);
+                setIsOpen(false)
+                return
+            }
+        } catch (error) {
+            console.log(error)
+            Alert.alert('Error in launching camera. Please try again.')
+        }
+
+    }
+
+  const accessAlbum = async () => {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+            setErrorMsg('Permission to access album was denied');
+            return;
+        }
+
+        try {
+            let result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                aspect: [16, 9],
+                quality: 0.5,
+                allowsMultipleSelection:false
+            });
+            if (!result.cancelled) {
+                setImage(result.uri);
+                setIsOpen(false)
+                return
+            }
+        } catch (error) {
+            console.log(error)
+            Alert.alert('Error in launching camera. Please try again.')
+        }
+
+    };
+
+  const closeBottomSheet = () => {
+        setIsOpen(false)
+    }
+
 
   const ProfileSchema = yup.object().shape({
     username: yup
@@ -31,83 +122,85 @@ export default function EditProfile() {
         .test('len', 'at least 4 characters', val => val.toString().length >= 4)
         .test('len', 'max 10 characters', val => val.toString().length <= 10)
         .required('Username is required')
-        .default(currentUserDetails?.username || ''),
+        .default(userData.username || ''),
     about: yup
         .string()
         .max(500, "Max 500 characters allowed")
-        .default(currentUserDetails?.about || '')
+        .default(userData.about || '')
         .optional(),
     interests: yup
         .string()
         .max(100, "Max 100 characters allowed")
-        .default(currentUserDetails?.interests || '')
+        .default(userData.interests || '')
         .optional(),
     display_status: yup
         .string()
         .required()
         .oneOf(['public', 'private'])
-        .default(currentUserDetails?.display_status || 'Public'), //public (true), private (false)
+        .default(userData.display_status || 'Public'), //public (true), private (false)
     sexual_orientation:yup
         .string()
         .oneOf(['gay', 'straight','lesbian','bisexual','other'])
-        .default(currentUserDetails?.sexual_orientation || '')
+        .default(userData.sexual_orientation || '')
         .optional(), //gay, straight, lesbian, bisexual, asexual, curious, none of the above
     age: yup.number('Must be a number')
         .min(16, 'You are not old enough to use this app')
-        .default(currentUserDetails?.age || 16)
+        .default(userData.age || 16)
         .optional(),
     gender: yup
         .string()
         .oneOf(['male','female','other'])
-        .default(currentUserDetails?.gender|| 'male')
+        .default(userData.gender|| 'male')
         .optional(), //male, female, prefer not to say
     job_title: yup
         .string()
-        .default(currentUserDetails?.job_title || '')
+        .default(userData.job_title || '')
         .optional(),
     skills: yup
         .string()
-        .default(currentUserDetails?.skills || '')
+        .default(userData.skills || '')
         .optional(),
     countries_travelled: yup
         .string()
         .max(100, "Max 100 characters allowed")
-        .default(currentUserDetails?.countries_travelled || '')
+        .default(userData.countries_travelled || '')
         .optional(),
     countries_lived: yup
         .string()
         .max(100, "Max 100 characters allowed")
-        .default(currentUserDetails?.countries_lived || '')
+        .default(userData.countries_lived || '')
         .optional(),
     favourite_cities: yup
         .string()
-        .default(currentUserDetails?.favourite_cities || '')
+        .default(userData.favourite_cities || '')
         .optional()
 })
 
   const {handleSubmit, handleBlur, errors, setValues, values, touched} = useFormik({
     initialValues: {
-        username: currentUserDetails?.username || '',
-        about: currentUserDetails?.about || '',
-        interests: currentUserDetails?.interests || '',
-        display_status: currentUserDetails?.display_status || 'public', //public (true), private (false)
-        sexual_orientation: currentUserDetails?.sexual_orientation || 'straight', //gay, straight, lesbian, bisexual, asexual, curious, none of the above
-        age: currentUserDetails?.age || '',
-        gender: currentUserDetails?.gender|| 'male', //male, female, prefer not to say
-        job_title: currentUserDetails?.job_title || '',
-        skills: currentUserDetails?.skills || '',
-        countries_travelled: currentUserDetails?.countries_travelled || '',
-        countries_lived: currentUserDetails?.countries_lived || '',
-        favourite_cities: currentUserDetails?.favourite_cities || '',
+        username: userData.username || '',
+        about: userData.about || '',
+        interests: userData.interests || '',
+        display_status: userData.display_status || 'public', //public (true), private (false)
+        sexual_orientation: userData.sexual_orientation || 'straight', //gay, straight, lesbian, bisexual, asexual, curious, none of the above
+        age: userData.age || '',
+        gender: userData.gender|| 'male', //male, female, prefer not to say
+        job_title: userData.job_title || '',
+        skills: userData.skills || '',
+        countries_travelled: userData.countries_travelled || '',
+        countries_lived: userData.countries_lived || '',
+        favourite_cities: userData.favourite_cities || '',
 
     },
     validationSchema: ProfileSchema,
     onSubmit: async (values) => {
         try {
-            console.log(values)
+            setUserData(values);
             await updateCurrentUserDetails(values);
+            const data = await getCurrentUserDetails()
+            setUserData(data)
         } catch(error) {
-            Alert.alert("Not saved.")
+            Alert.alert("Changes are not saved. Please try again.")
         }
     }
   })
@@ -120,16 +213,19 @@ export default function EditProfile() {
         keyboardOpeningTime={200}
         >
         <View style={{flex:1, justifyContent:'flex-end', height:"100%"}}>
-            <View className="flex self-center pt-[6%]">
-                <Avatar imageURL={"https://randomuser.me/api/portraits/women/34.jpg"} size={200}/>
-            </View>
+            <TouchableRipple 
+                className="flex self-center pt-[6%]"
+                onPress={() => handleSnapPress(0)}
+            >
+                <Avatar imageURL={image} size={200}/>
+            </TouchableRipple>
             {!loading && 
             (<View className="flex self-center pt-[2%] pb-[6%]">
                 <Text 
                     className="text-center text-2xl text-[#141bab] font-bold"
                     style={GlobalStyles.CustomFont}
                 >
-                    {currentUserDetails && currentUserDetails.username}
+                    {userData && userData.username}
                 </Text>
             </View>)}
 
@@ -149,7 +245,7 @@ export default function EditProfile() {
                 </TouchableRipple>
                 <TouchableRipple 
                     className="w-[50%] border-slate-300 border-r-[1rem] h-full justify-center bg-white"
-                    onPress={() => navigation.navigate('PreviewProfile')}
+                    onPress={() => navigation.navigate('PreviewProfile', userData)}
                 >
                 <View className="flex flex-row justify-between">
                     <Text 
@@ -180,15 +276,16 @@ export default function EditProfile() {
                         })}}
                     onBlur = {() => handleBlur('username')}
                     autoCapitalize = {"none"}
-                    value = {currentUserDetails?.username  || values.username }
+                    value = {userData.username  || values.username }
                     multiline = {false}
+                    textContentType={"username"}
                 />
                 {touched.username && errors.username && <Text className="text-red-500 pl-[4%] pb-[2%]">{errors.username}</Text>}
                 {/* About */}
                 <ProfileFormInputLabel inputLabel='ABOUT ME'/>
                 <ProfileFormInputField 
                     iconName = {""}
-                    placeholderText = {"Say something fun."}
+                    placeholderText = {"Say something fun..."}
                     placeholderTextColor = {"#666666"}
                     autoCorrect ={false}
                     secureTextEntry = {false}
@@ -198,7 +295,7 @@ export default function EditProfile() {
                         })}}
                     onBlur = {() => handleBlur('about')}
                     autoCapitalize = {"none"}
-                    value = { currentUserDetails?.about || values.about }
+                    value = { userData.about || values.about }
                     multiline = {true}
                     height={100}
                 />
@@ -206,7 +303,7 @@ export default function EditProfile() {
 
                 {/* Age*/}
                 <ProfileFormInputLabel inputLabel='AGE'/>
-                <ProfileInputAgePicker setValues={setValues} defaultAge={currentUserDetails.age}/>
+                <ProfileInputAgePicker setValues={setValues} defaultAge={userData.age}/>
                 {errors.age && <Text className="text-red-500">{errors.age}</Text>}
 
                 {/* Interests */}
@@ -223,7 +320,7 @@ export default function EditProfile() {
                         })}}
                     onBlur = {() => handleBlur('interests')}
                     autoCapitalize = {"none"}
-                    value = { currentUserDetails?.interests || values.interests }
+                    value = { userData.interests || values.interests }
                     multiline = {true}
                     height={60}
                 />
@@ -275,7 +372,7 @@ export default function EditProfile() {
 
                 {/* Sexual orientation */}
                 <ProfileFormInputLabel inputLabel='SEXUAL ORIENTATION'/>
-                <ProfileInputRadioButton setValues={setValues} defaultValue={currentUserDetails.sexual_orientation.charAt(0).toUpperCase() + currentUserDetails.sexual_orientation.slice(1) || 'Straight'}/>
+                <ProfileInputRadioButton setValues={setValues} defaultValue={CapFirstCharacter(userData.sexual_orientation) || 'Straight'}/>
                 {errors.sexual_orientation && <Text className="text-red-500 pl-[4%] pb-[2%]">{errors.sexual_orientation}</Text>}
                 
                 {/* Job Title */}
@@ -292,9 +389,10 @@ export default function EditProfile() {
                         })}}
                     onBlur = {() => handleBlur('job_title')}
                     autoCapitalize = {"none"}
-                    value = { currentUserDetails?.job_title  || values.job_title }
+                    value = { userData.job_title  || values.job_title }
                     multiline = {true}
                     height={40}
+                    textContentType={"jobTitle"}
                 />
                 {touched.job_title && errors.job_title && <Text className="text-red-500 pl-[4%] pb-[2%]">{errors.job_title}</Text>}
 
@@ -313,7 +411,7 @@ export default function EditProfile() {
                         })}}
                     onBlur = {() => handleBlur('skills')}
                     autoCapitalize = {"none"}
-                    value = {currentUserDetails?.skills || values.skills }
+                    value = {userData.skills || values.skills }
                     multiline = {true}
                     height={60}
                 />
@@ -333,9 +431,10 @@ export default function EditProfile() {
                         })}}
                     onBlur = {() => handleBlur('countries_travelled')}
                     autoCapitalize = {"none"}
-                    value = {currentUserDetails?.countries_travelled  || values.countries_travelled}
+                    value = {userData.countries_travelled  || values.countries_travelled}
                     multiline = {true}
                     height={60}
+                    textContentType={"countryName"}
                 />
                 {touched.countries_travelled && errors.countries_travelled && <Text className="text-red-500 pl-[4%] pb-[2%]">{errors.countries_travelled}</Text>}
                 
@@ -353,9 +452,10 @@ export default function EditProfile() {
                         })}}
                     onBlur = {() => handleBlur('countries_travelled')}
                     autoCapitalize = {"none"}
-                    value = { currentUserDetails?.countries_lived || values.countries_lived }
+                    value = { userData.countries_lived || values.countries_lived }
                     multiline = {true}
                     height={60}
+                    textContentType={"countryName"}
                 />
                 {touched.countries_lived && errors.countries_lived && <Text className="text-red-500 pl-[4%] pb-[2%]">{errors.countries_lived}</Text>}
                 
@@ -373,15 +473,36 @@ export default function EditProfile() {
                         })}}
                     onBlur = {() => handleBlur('favourite_cities')}
                     autoCapitalize = {"none"}
-                    value = {currentUserDetails?.favourite_cities || values.favourite_cities }
+                    value = {userData.favourite_cities || values.favourite_cities }
                     multiline = {true}
                     height={60}
+                    textContentType={"addressCity"}
                 />
                 {touched.favourite_cities && errors.favourite_cities && <Text className="text-red-500 pl-[4%] pb-[2%]">{errors.favourite_cities}</Text>}
-               
+                
+                
         </View>
     </KeyboardAwareScrollView>
     <Footer screen="Profile"/>
+    {isOpen && (<BottomSheet
+                ref={sheetRef}
+                snapPoints={snapPoints}
+                animateOnMount
+                enablePanDownToClose={true}
+                enableContentPanningGesture={true}
+                onClose={() => setIsOpen(false)}
+                handleStyle={{backgroundColor:"#444444", opacity:0.4}}
+                backgroundStyle={{backgroundColor:"#8d8d8d", opacity:0.9}}
+            >
+                <BottomSheetView
+                    style={{paddingTop:15}}
+                    animationConfigs = {animationConfigs}
+                >
+                    <AuthButton btnText={"Take Photo"} btnAction={accessCamera}/>
+                    <AuthButton btnText={"Choose from Library"} btnAction={accessAlbum}/>
+                    <AuthButton btnText={"Cancel"} btnAction={closeBottomSheet}/>
+                </BottomSheetView>
+            </BottomSheet>)}
     </>
   )
 }

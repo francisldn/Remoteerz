@@ -2,6 +2,7 @@
 import { initializeApp } from "firebase/app";
 import {getFirestore} from 'firebase/firestore';
 import {getAuth} from 'firebase/auth'
+import {getStorage, ref} from 'firebase/storage';
 // how to add env variables in react native app  - https://levelup.gitconnected.com/using-environment-variables-in-a-react-native-app-f2dd005d2457
 import {
   RN_APP_APIKEY,
@@ -27,3 +28,4 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore() // to store user, chat and photos
 export const auth = getAuth();
+export const storage = getStorage();
