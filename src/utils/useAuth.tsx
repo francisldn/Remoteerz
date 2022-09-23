@@ -183,7 +183,11 @@ export const AuthProvider = ({children}) => {
         return userDetails;
     }
 
-    const updateCurrentUserDetails = async (email) => {}
+    const updateCurrentUserDetails = async (uid, userData) => {
+        const docRef = doc(db,"Users",id)
+        collection
+
+    }
     // more performant
     // similar to useEffect but only re-compute if one of the dependencies changes
     const memoedValue = useMemo(() => ({

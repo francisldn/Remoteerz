@@ -25,39 +25,13 @@ export default function EditProfile() {
   const [displayValue, setDisplayValue] = useState("Public");
   const [genderValue, setGenderValue] = useState('Male')
 
-  const {handleSubmit, handleBlur, errors, setValues, values, handleChange, touched} = useFormik({
-    initialValues: {
-        username: currentUserDetails?.username || '',
-        about: currentUserDetails?.about || '',
-        interests: currentUserDetails?.interests || '',
-        display_status: currentUserDetails?.display_status || 'public', //public (true), private (false)
-        sexual_orientation: currentUserDetails?.sexual_orientation || 'straight', //gay, straight, lesbian, bisexual, asexual, curious, none of the above
-        age: currentUserDetails?.age || '',
-        gender: currentUserDetails?.gender|| 'male', //male, female, prefer not to say
-        job_title: currentUserDetails?.job_title || '',
-        skills: currentUserDetails?.skills || '',
-        countries_travelled: currentUserDetails?.countries_travelled || '',
-        countries_lived: currentUserDetails?.countries_lived || '',
-        favourite_cities: currentUserDetails?.favourite_cities || '',
-
-    },
-    validationSchema: ProfileSchema,
-    onSubmit: (values) => {
-        try {
-            console.log(values)
-            //submit the form
-        } catch(error) {
-            Alert.alert("Not saved.")
-        }
-    }
-  })
 
   const ProfileSchema = yup.object().shape({
     username: yup
         .string()
-        // .test('len', 'at least 4 characters', val => val.toString().length >= 4)
-        // .test('len', 'max 10 characters', val => val.toString().length <= 10)
-        // .required('Username is required')
+        .test('len', 'at least 4 characters', val => val.toString().length >= 4)
+        .test('len', 'max 10 characters', val => val.toString().length <= 10)
+        .required('Username is required')
         .default(currentUserDetails?.username || ''),
     about: yup
         .string()
@@ -111,6 +85,34 @@ export default function EditProfile() {
         .default(currentUserDetails?.favourite_cities || '')
         .optional()
 })
+
+  const {handleSubmit, handleBlur, errors, setValues, values, handleChange, touched} = useFormik({
+    initialValues: {
+        username: currentUserDetails?.username || '',
+        about: currentUserDetails?.about || '',
+        interests: currentUserDetails?.interests || '',
+        display_status: currentUserDetails?.display_status || 'public', //public (true), private (false)
+        sexual_orientation: currentUserDetails?.sexual_orientation || 'straight', //gay, straight, lesbian, bisexual, asexual, curious, none of the above
+        age: currentUserDetails?.age || '',
+        gender: currentUserDetails?.gender|| 'male', //male, female, prefer not to say
+        job_title: currentUserDetails?.job_title || '',
+        skills: currentUserDetails?.skills || '',
+        countries_travelled: currentUserDetails?.countries_travelled || '',
+        countries_lived: currentUserDetails?.countries_lived || '',
+        favourite_cities: currentUserDetails?.favourite_cities || '',
+
+    },
+    validationSchema: ProfileSchema,
+    onSubmit: (values) => {
+        try {
+            console.log(values)
+            //submit the form
+        } catch(error) {
+            Alert.alert("Not saved.")
+        }
+    }
+  })
+
 
   return (
     <>
