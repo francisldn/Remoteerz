@@ -25,22 +25,22 @@ import { uploadImageToFirestore } from '../utils/helperFunctions';
 const placeholderImageURL = "https://firebasestorage.googleapis.com/v0/b/remoteers-360d0.appspot.com/o/icons8-selfies-100.png?alt=media&token=da1fef51-7ede-4f32-a559-1270ba1fe95f"
 
 export default function EditProfile({route}) {
+  const {userData, setUserData} = route.params
   const {currentUserDetails, loading, updateCurrentUserDetails, getCurrentUserDetails} = useAuth()
-  const [userData, setUserData] = useState(currentUserDetails || route.params)
   const navigation = useNavigation()
   const [displayValue, setDisplayValue] = useState(CapFirstCharacter(userData.display_status) || 'Public' );
   const [genderValue, setGenderValue] = useState(CapFirstCharacter(userData.gender)|| 'Male');
-  const [image, setImage] = useState(placeholderImageURL)
+  const [image, setImage] = useState(userData.image || placeholderImageURL)
   const [isOpen, setIsOpen] = useState(false);
+  const [age, setAge] = useState(userData.age?.toString() || '18')
 
   // get user details
   useEffect(() => {
-    if(!currentUserDetails) {
-        try{
-            getCurrentUserDetails().then(data => setUserData(data));
-        } catch (error) {
-            console.log(error)
-        }
+    console.log(userData.image)
+    try {
+        getCurrentUserDetails().then(data => setUserData(data));
+    } catch (error) {
+        console.log(error)
     }
   },[currentUserDetails])
 
@@ -75,8 +75,13 @@ export default function EditProfile({route}) {
             
             if (!result.cancelled) {
                 setImage(result.uri);
+                // this does not work --> to check
+                const url = await uploadImageToFirestore(result.uri)
+                const imageData = {image: url}
+                await updateCurrentUserDetails(imageData)
+                    .then(() => console.log('image successfully updated'))
+                    .catch((error) => console.log(error))
                 setIsOpen(false)
-                return
             }
         } catch (error) {
             console.log(error)
@@ -100,14 +105,17 @@ export default function EditProfile({route}) {
                 quality: 0.5,
                 allowsMultipleSelection:false
             });
+
             if (!result.cancelled) {
                 setImage(result.uri);
                 const url = await uploadImageToFirestore(result.uri)
-                console.log(url)
                 const imageData = {image: url}
                 await updateCurrentUserDetails(imageData)
                     .then(() => console.log('image successfully updated'))
                     .catch((error) => console.log(error))
+                const newData = await getCurrentUserDetails();
+                setUserData(newData);
+
                 setIsOpen(false)
             }
         } catch (error) {
@@ -121,7 +129,7 @@ export default function EditProfile({route}) {
         setIsOpen(false)
     }
 
-
+  // Schema for Profile form
   const ProfileSchema = yup.object().shape({
     username: yup
         .string()
@@ -203,7 +211,7 @@ export default function EditProfile({route}) {
         try {
             setUserData(values);
             await updateCurrentUserDetails(values);
-            const data = await getCurrentUserDetails()
+            const data = await getCurrentUserDetails();
             setUserData(data)
         } catch(error) {
             Alert.alert("Changes are not saved. Please try again.")
@@ -251,7 +259,7 @@ export default function EditProfile({route}) {
                 </TouchableRipple>
                 <TouchableRipple 
                     className="w-[50%] border-slate-300 border-r-[1rem] h-full justify-center bg-white"
-                    onPress={() => navigation.navigate('PreviewProfile', userData)}
+                    onPress={() => navigation.navigate('PreviewProfile', {userData, setUserData})}
                 >
                 <View className="flex flex-row justify-between">
                     <Text 
@@ -282,7 +290,7 @@ export default function EditProfile({route}) {
                         })}}
                     onBlur = {() => handleBlur('username')}
                     autoCapitalize = {"none"}
-                    value = {userData.username  || values.username }
+                    value = {values.username ||userData.username }
                     multiline = {false}
                     textContentType={"username"}
                 />
@@ -301,7 +309,7 @@ export default function EditProfile({route}) {
                         })}}
                     onBlur = {() => handleBlur('about')}
                     autoCapitalize = {"none"}
-                    value = { userData.about || values.about }
+                    value = { values.about || userData.about }
                     multiline = {true}
                     height={100}
                 />
@@ -309,7 +317,7 @@ export default function EditProfile({route}) {
 
                 {/* Age*/}
                 <ProfileFormInputLabel inputLabel='AGE'/>
-                <ProfileInputAgePicker setValues={setValues} defaultAge={userData.age}/>
+                <ProfileInputAgePicker setValues={setValues} age={age || values.age} setAge={setAge}/>
                 {errors.age && <Text className="text-red-500">{errors.age}</Text>}
 
                 {/* Interests */}
@@ -326,7 +334,7 @@ export default function EditProfile({route}) {
                         })}}
                     onBlur = {() => handleBlur('interests')}
                     autoCapitalize = {"none"}
-                    value = { userData.interests || values.interests }
+                    value = { values.interests || userData.interests }
                     multiline = {true}
                     height={60}
                 />
@@ -395,7 +403,7 @@ export default function EditProfile({route}) {
                         })}}
                     onBlur = {() => handleBlur('job_title')}
                     autoCapitalize = {"none"}
-                    value = { userData.job_title  || values.job_title }
+                    value = {  values.job_title || userData.job_title }
                     multiline = {true}
                     height={40}
                     textContentType={"jobTitle"}
@@ -417,7 +425,7 @@ export default function EditProfile({route}) {
                         })}}
                     onBlur = {() => handleBlur('skills')}
                     autoCapitalize = {"none"}
-                    value = {userData.skills || values.skills }
+                    value = {values.skills || userData.skills }
                     multiline = {true}
                     height={60}
                 />
@@ -437,7 +445,7 @@ export default function EditProfile({route}) {
                         })}}
                     onBlur = {() => handleBlur('countries_travelled')}
                     autoCapitalize = {"none"}
-                    value = {userData.countries_travelled  || values.countries_travelled}
+                    value = {values.countries_travelled || userData.countries_travelled }
                     multiline = {true}
                     height={60}
                     textContentType={"countryName"}
@@ -458,7 +466,7 @@ export default function EditProfile({route}) {
                         })}}
                     onBlur = {() => handleBlur('countries_travelled')}
                     autoCapitalize = {"none"}
-                    value = { userData.countries_lived || values.countries_lived }
+                    value = { values.countries_lived || userData.countries_lived }
                     multiline = {true}
                     height={60}
                     textContentType={"countryName"}
@@ -479,7 +487,7 @@ export default function EditProfile({route}) {
                         })}}
                     onBlur = {() => handleBlur('favourite_cities')}
                     autoCapitalize = {"none"}
-                    value = {userData.favourite_cities || values.favourite_cities }
+                    value = { values.favourite_cities || userData.favourite_cities }
                     multiline = {true}
                     height={60}
                     textContentType={"addressCity"}

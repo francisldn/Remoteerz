@@ -1,4 +1,4 @@
-
+// @type-nocheck
 import { StyleSheet, Text, View, Pressable, TouchableWithoutFeedback } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -13,6 +13,7 @@ import Hangouts from './src/screens/Hangouts';
 import Chatroom from './src/screens/Chatroom';
 import EditProfile from './src/screens/EditProfile';
 import PreviewProfile from './src/screens/PreviewProfile';
+import UserDetails from './src/screens/UserDetails';
 import Logout from './src/screens/Logout';
 import { AuthProvider } from './src/utils/useAuth';
 import { LocationProvider } from './src/utils/useLocation';
@@ -27,7 +28,7 @@ export default function App() {
       <LocationProvider>
       <NavigationContainer>
         <Stack.Navigator>
-            <Stack.Screen
+            {/* <Stack.Screen
               name="Login"
               component={Login}
             />
@@ -57,22 +58,26 @@ export default function App() {
               name="ForgotPassword"
               component={ForgotPassword}
             />
-          <Stack.Screen
-              name="Profile"
-              component={Profile}
-            />
+          
           <Stack.Screen
               name="Dashboard"
               component={Dashboard}
               options= {() => ({
                 headerBackVisible:false,
               })}
-            />
+            /> */}
           <Stack.Screen
             name="Hangouts"
             component={Hangouts}
             options= {() => ({
               headerBackVisible:false,
+            })}
+          />
+          <Stack.Screen
+            name="UserDetails"
+            component={UserDetails}
+            options= {() => ({
+              title:"User Details",
             })}
           />
           <Stack.Screen
@@ -82,6 +87,10 @@ export default function App() {
               headerBackVisible:false,
             })}
           />
+          <Stack.Screen
+              name="Profile"
+              component={Profile}
+            />
           <Stack.Screen
             name="EditProfile"
             component={EditProfile}

@@ -20,8 +20,8 @@ const initialValues = {
 }
 
 export default function PreviewProfile({route}) {
-  const {currentUserDetails} = useAuth()
-  const [userData, setUserData] = useState(currentUserDetails || route.params || initialValues)
+  const {userData, setUserData} = route.params
+
   
   return (
     <>

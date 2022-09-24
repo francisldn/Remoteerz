@@ -9,18 +9,19 @@ import SettingList from '../components/SettingList'
 import { TouchableRipple } from 'react-native-paper';
 import { useAuth } from '../utils/useAuth';
 
+const placeholderImageURL = "https://firebasestorage.googleapis.com/v0/b/remoteers-360d0.appspot.com/o/icons8-selfies-100.png?alt=media&token=da1fef51-7ede-4f32-a559-1270ba1fe95f"
+
 export default function Profile() {
   const {currentUserDetails, loading, getCurrentUserDetails} = useAuth()
   const [userData, setUserData] = useState(currentUserDetails)
+  const [profileImage, setProfileImage] = useState(placeholderImageURL)
   const navigation = useNavigation()
 
   useEffect(() => {
-    if(!currentUserDetails) {
-        try {
-            getCurrentUserDetails().then((data) => setUserData(data))
-        }catch(error) {
-            console.log(error)
-        }
+    try {
+        getCurrentUserDetails().then((data) => setUserData(data))
+    } catch(error) {
+        console.log(error)
     }
   },[currentUserDetails])
   
@@ -30,7 +31,7 @@ export default function Profile() {
     <>
         <ScrollView className="flex-1 ">
             <View className="flex self-center pt-[6%]">
-                <Avatar imageURL={"https://randomuser.me/api/portraits/women/34.jpg"} size={200}/>
+                <Avatar imageURL={profileImage} size={200}/>
             </View>
             {!loading && 
             (<View className="flex self-center pt-[2%] pb-[6%]">
@@ -45,7 +46,7 @@ export default function Profile() {
             <View className="flex flex-row justify-around w-full bg-white h-[60] items-center">
                 <TouchableRipple 
                     className="w-[50%] border-r-[1rem] h-full justify-center border-r-[#b6b6b6]"
-                    onPress={() => navigation.navigate('EditProfile',userData)}
+                    onPress={() => navigation.navigate('EditProfile',{userData, setUserData})}
                     rippleColor="rgba(0, 0, 0, .32)"
                 >
                    
@@ -58,7 +59,7 @@ export default function Profile() {
                 </TouchableRipple>
                 <TouchableRipple 
                     className="w-[50%] h-full justify-center"
-                    onPress={() => navigation.navigate('PreviewProfile',userData)}
+                    onPress={() => navigation.navigate('PreviewProfile',{userData, setUserData})}
                 >
                      <Text 
                             className="text-xl text-center"

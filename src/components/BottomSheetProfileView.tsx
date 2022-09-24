@@ -11,14 +11,12 @@ export default function BottomSheetProfileView({userData, setUserData}) {
     const snapPoints = useMemo(() => ["20%", "50%", "90%"], []);
 
     useEffect(() => {
-        if(!currentUserDetails || !userData) {
-            try{
-                getCurrentUserDetails().then(data => setUserData(data));
-            } catch (error) {
-                console.log(error)
-            }
+        try{
+            getCurrentUserDetails().then(data => setUserData(data));
+        } catch (error) {
+            console.log(error)
         }
-      },[currentUserDetails])
+    },[currentUserDetails])
 
     
     if(loading && !currentUserDetails) return
