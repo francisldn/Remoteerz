@@ -37,7 +37,7 @@ export const updateCurrentUserDetails = async (userData, userId) => {
     }
 }
 
-export const getCurrentUserDetails = async (userId) => {
+export const getCurrentUserDetails = async (userId:string) => {
     const docRef = doc(db,"Users",userId)
     try {
         const userDetails = await getDoc(docRef)
@@ -119,7 +119,7 @@ export const AuthProvider = ({children}) => {
                 {
                     uid: userCredential.user && userCredential.user.uid,
                     email: userCredential.user && userCredential.user.email,
-                    avatar:null,
+                    image:null,
                     username: username,
                     display_status: null,
                     relationship_status:null,

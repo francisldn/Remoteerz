@@ -129,7 +129,7 @@ export default function EditProfile() {
     username: yup
         .string()
         .test('len', 'at least 4 characters', val => val.toString().length >= 4)
-        .test('len', 'max 10 characters', val => val.toString().length <= 10)
+        .test('len', 'max 20 characters', val => val.toString().length <= 20)
         .required('Username is required')
         .default(currentUserDetails.username || ''),
     about: yup

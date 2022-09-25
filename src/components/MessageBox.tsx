@@ -51,7 +51,7 @@ const MessageBox = ({avatar, name, msg, datetime}) => {
             renderRightActions={RenderRight}
             onSwipeableOpen={deleteMsg}
         >
-            <TouchableOpacity
+            <View
                 ref={deleteRef}
                 style={[styles.boxContainer]} 
                 onPress={() => navigation.navigate('UserChat')}
@@ -70,7 +70,7 @@ const MessageBox = ({avatar, name, msg, datetime}) => {
                         <Text style={[GlobalStyles.CustomFont,styles.date]}>{dateTimeFormat(Number(datetime))}</Text>
                     </View>
                 </View>
-            </TouchableOpacity>
+            </View>
         </Swipeable>
     );
 }
