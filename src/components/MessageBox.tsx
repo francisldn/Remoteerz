@@ -23,8 +23,7 @@ const MessageBox = ({chatroom}) => {
     }
 
     const chatUser = getChatUser(users);
-    
-    
+
     const navigation = useNavigation()
     const deleteRef= useRef(null);
     // progress is not used but left it for better understanding of the arguments
@@ -70,7 +69,7 @@ const MessageBox = ({chatroom}) => {
         >
             <View
                 ref={deleteRef}
-                className="flex flex-row w-full h-[100] border-[#222f9f] border-[0.4] bg-[#e5eeff] items-center"
+                className="flex flex-row w-full h-[100] border-[#222f9f] border-[0.3rem] bg-[#e5eeff] items-center"
                 onPress={() => navigation.navigate('UserChat')}
             >
                 

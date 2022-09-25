@@ -22,7 +22,7 @@ export async function getCurrentLocation() {
     let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         console.log('status denied')
-        return;
+        throw new Error('Location service disabled')
       }
     try {
       let loc = await Location.getCurrentPositionAsync()
