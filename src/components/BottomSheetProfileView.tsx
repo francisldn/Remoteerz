@@ -7,29 +7,40 @@ import { CapFirstCharacter } from "../utils/helperFunctions";
 import { Ionicons } from '@expo/vector-icons'; 
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useAuth } from "../utils/useAuth";
-import { updateCurrentUserDetails, getCurrentUserDetails } from '../utils/useAuth';
+import { updateUserDetails, getUserDetails } from '../utils/useAuth';
 import { useNavigation } from "@react-navigation/native";
+import { displayDistance } from "../utils/helperFunctions";
+import LoadingSpinner from "./LoadingSpinner";
 
 export default function BottomSheetProfileView({userDetails, preview}) {
     const {currentUserDetails, setCurrentUserDetails} = useAuth();
     const navigation = useNavigation();
+    if(!userDetails || !currentUserDetails) return (<LoadingSpinner size={"large"}/>)
 
     const snapPoints = useMemo(() => ["20%", "50%", "90%"], []);
 
     const isFriend = (id:string) => {
+        if(!currentUserDetails || !userDetails) {
+            console.log('current user details not loaded.')
+            return
+        }
         return currentUserDetails?.myFriends.includes(id) ? true : false;
     }
 
     const addToFriends = async (id:string) => {
         let newFriends = []
+        if(!currentUserDetails || !userDetails) {
+            console.log('current user details not loaded.')
+            return
+        }
         if (isFriend(id)) {
             newFriends = currentUserDetails?.myFriends.filter(userId => userId !== id);
         } else {
             newFriends = [...currentUserDetails?.myFriends, id];
         }
         try {
-            await updateCurrentUserDetails({...currentUserDetails, myFriends: newFriends}, currentUserDetails.uid)
-            const data = await getCurrentUserDetails(currentUserDetails.uid)
+            await updateUserDetails({ myFriends: newFriends}, currentUserDetails?.uid)
+            const data = await getUserDetails(currentUserDetails?.uid)
             setCurrentUserDetails(data)
         } catch (error) {
             console.log(error)
@@ -38,7 +49,7 @@ export default function BottomSheetProfileView({userDetails, preview}) {
     
 
 
-    if(!userDetails) return
+    
 
     return (
       <>
@@ -51,15 +62,15 @@ export default function BottomSheetProfileView({userDetails, preview}) {
         >
           <BottomSheetScrollView contentContainerStyle={styles.contentContainer}>
             <View className="flex flex-row justify-between">
-                <View className="flex flex-row">
-                    <Text className="text-white text-3xl pr-5" style={GlobalStyles.CustomFont}>{userDetails?.username}</Text>
-                    <Text className="text-white text-3xl" style={GlobalStyles.CustomFont}>{userDetails?.age}</Text>
+                <View className="flex flex-row w-[55%]">
+                    <Text className="text-white text-3xl pr-5" style={GlobalStyles.CustomFont} numberOfLines={1} ellipsizeMode="tail">{userDetails?.username}</Text>
+                    <Text className="text-white text-3xl" style={GlobalStyles.CustomFont} numberOfLines={1} ellipsizeMode="tail">{userDetails?.age}</Text>
                 </View>
                 
                 {!preview && 
                     (<View className="flex flex-row">
                         <TouchableOpacity onPress={() => addToFriends(userDetails.uid)}>
-                            {isFriend(userDetails.uid) 
+                            {isFriend(userDetails?.uid) 
                                 ? (<FontAwesome5 name="user-check" size={30} color="#22C55E" style={{paddingRight:'9%'}} />)
                                 : (<Ionicons name="person-add" size={32} color="#b4bcff" style={{paddingRight:'9%'}}/>)
                             }
@@ -69,74 +80,85 @@ export default function BottomSheetProfileView({userDetails, preview}) {
                         </TouchableOpacity>
                     </View>)}
             </View> 
-            <View className="pt-4 pb-16">
+            <View className="pt-4 pb-16 flex flex-row">
                 {userDetails?.online 
                 ? (<Text className="text-green-500" style={GlobalStyles.CustomFont}>Online now</Text>)
                 : (<Text className="text-white" style={GlobalStyles.CustomFont}>Offline</Text>)
                 }
+                {!preview &&
+                    <Text className="text-white" style={[GlobalStyles.CustomFont,{marginLeft:'5%'}]}>{displayDistance(userDetails.distance)}</Text>
+                }
             </View>
             <View className="flex flex-row pb-5 border-b-[0.3rem] border-opacity-10 border-b-[#aeaeae]">
                 <View className="w-[40%]">
-                    <Text className="text-gray-300 text-md" style={GlobalStyles.CustomFont}>Interest</Text>
+                    <Text className="text-gray-300 text-md" style={GlobalStyles.CustomFont}>About</Text>
                 </View>
-                <View>
-                    <Text className="text-white text-md" style={GlobalStyles.CustomFont}>{CapFirstCharacter(userDetails?.interests)}</Text>
+                <View className="w-[60%]">
+                    <Text className="text-white text-md" style={GlobalStyles.CustomFont} numberOfLines={1} ellipsizeMode="tail">{CapFirstCharacter(userDetails?.about)}</Text>
+                </View>
+            </View>
+            <View className="flex flex-row pt-5 pb-5 border-b-[0.3rem] border-opacity-10 border-b-[#aeaeae]">
+                <View className="w-[40%]">
+                    <Text className="text-gray-300 text-md" style={GlobalStyles.CustomFont}>Interests</Text>
+                </View>
+                <View className="w-[60%]">
+                    <Text className="text-white text-md" style={GlobalStyles.CustomFont} numberOfLines={1} ellipsizeMode="tail">{CapFirstCharacter(userDetails?.interests)}</Text>
                 </View>
             </View>
             <View className="flex flex-row pt-5 pb-5 border-b-[0.3rem] border-opacity-10 border-b-[#aeaeae]">
                 <View className="w-[40%]">
                     <Text className="text-gray-300 text-md" style={GlobalStyles.CustomFont}>Gender</Text>
                 </View>
-                <View>
-                    <Text className="text-white text-md" style={GlobalStyles.CustomFont}>{CapFirstCharacter(userDetails?.gender)}</Text>
+                <View className="w-[60%]">
+                    <Text className="text-white text-md" style={GlobalStyles.CustomFont} numberOfLines={1} ellipsizeMode="tail">{CapFirstCharacter(userDetails?.gender)}</Text>
                 </View>
             </View>
             <View className="flex flex-row pt-5 pb-5 border-b-[0.3rem] border-opacity-10 border-b-[#aeaeae]">
                 <View className="w-[40%]">
                     <Text className="text-gray-300 text-md" style={GlobalStyles.CustomFont}>Sexual Orientation</Text>
                 </View>
-                <View>
-                    <Text className="text-white text-md" style={GlobalStyles.CustomFont}>{CapFirstCharacter(userDetails?.sexual_orientation)}</Text>
+                <View className="w-[60%]">
+                    <Text className="text-white text-md" style={GlobalStyles.CustomFont} numberOfLines={1} ellipsizeMode="tail">{CapFirstCharacter(userDetails?.sexual_orientation)}</Text>
                 </View>
             </View>
             <View className="flex flex-row pt-5 pb-5 border-b-[0.3rem] border-opacity-10 border-b-[#aeaeae]">
                 <View className="w-[40%]">
                     <Text className="text-gray-300 text-md" style={GlobalStyles.CustomFont}>Job Title</Text>
                 </View>
-                <View>
-                    <Text className="text-white text-md" style={GlobalStyles.CustomFont}>{CapFirstCharacter(userDetails?.job_title)}</Text>
+                <View className="w-[60%]">
+                    <Text className="text-white text-md" style={GlobalStyles.CustomFont} numberOfLines={1} ellipsizeMode="tail">{CapFirstCharacter(userDetails?.job_title)}</Text>
                 </View>
             </View>
             <View className="flex flex-row pt-5 pb-5 border-b-[0.3rem] border-opacity-10 border-b-[#aeaeae]">
                 <View className="w-[40%]">
                     <Text className="text-gray-300 text-md" style={GlobalStyles.CustomFont}>Skills</Text>
                 </View>
-                <View>
-                    <Text className="text-white text-md" style={GlobalStyles.CustomFont}>{CapFirstCharacter(userDetails?.skills)}</Text>
+                <View className="w-[60%]">
+                    <Text className="text-white text-md" style={GlobalStyles.CustomFont} numberOfLines={1} ellipsizeMode="tail">{CapFirstCharacter(userDetails?.skills)}</Text>
                 </View>
             </View>
             <View className="flex flex-row pt-5 pb-5 border-b-[0.3rem] border-opacity-10 border-b-[#aeaeae]">
                 <View className="w-[40%]">
                     <Text className="text-gray-300 text-md" style={GlobalStyles.CustomFont}>Countries Travelled</Text>
                 </View>
-                <View>
-                    <Text className="text-white text-md" style={GlobalStyles.CustomFont}>{CapFirstCharacter(userDetails?.countries_travelled)}</Text>
+                <View className="w-[60%]">
+                    <Text className="text-white text-md" style={GlobalStyles.CustomFont} numberOfLines={1} ellipsizeMode="tail">{CapFirstCharacter(userDetails?.countries_travelled)}</Text>
                 </View>
             </View>
             <View className="flex flex-row pt-5 pb-5 border-b-[0.3rem] border-opacity-10 border-b-[#aeaeae]">
                 <View className="w-[40%]">
                     <Text className="text-gray-300 text-md" style={GlobalStyles.CustomFont}>Countries Lived</Text>
                 </View>
-                <View>
-                    <Text className="text-white text-md" style={GlobalStyles.CustomFont}>{CapFirstCharacter(userDetails?.countries_lived)}</Text>
+                <View className="w-[60%]">
+                    <Text className="text-white text-md" style={GlobalStyles.CustomFont} numberOfLines={1} ellipsizeMode="tail">{CapFirstCharacter(userDetails?.countries_lived)}</Text>
                 </View>
             </View>
             <View className="flex flex-row pt-5 pb-5 border-b-[0.3rem] border-opacity-10 border-b-[#aeaeae]">
                 <View className="w-[40%]">
                     <Text className="text-gray-300 text-md" style={GlobalStyles.CustomFont}>Favourite Cities</Text>
                 </View>
-                <View>
-                    <Text className="text-white text-md" style={GlobalStyles.CustomFont}>{CapFirstCharacter(userDetails?.favourite_cities)}</Text>
+                <View className="w-[60%]">
+                    <Text className="text-white text-md" style={GlobalStyles.CustomFont} numberOfLines={1} ellipsizeMode="tail">{CapFirstCharacter(userDetails?.favourite_cities)}</Text>
                 </View>
             </View>
           </BottomSheetScrollView>

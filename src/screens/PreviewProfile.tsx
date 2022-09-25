@@ -4,8 +4,7 @@ import React from 'react'
 import BottomSheetProfileView from '../components/BottomSheetProfileView';
 import ProfileImageCard from '../components/ProfileImageCard';
 import { useAuth } from '../utils/useAuth';
-import { placeholderImageURL } from './Profile';
-
+import { chatService } from '../utils/chatService';
 const initialValues = {
   username: 'Alicia',
   about: 'I live in London',
@@ -22,7 +21,8 @@ const initialValues = {
 
 export default function PreviewProfile() {
   const {currentUserDetails} = useAuth()
-  const imageURL = currentUserDetails?.image || placeholderImageURL
+  const {placeholderImages} = chatService()
+  const imageURL = currentUserDetails?.image || placeholderImages[Math.round(Math.random())]
   return (
     <View style={styles.container}>
       <ProfileImageCard imageURL={imageURL}/>

@@ -1,0 +1,102 @@
+[
+    {
+        "uid": "Ux9OiFMj2SVTIUReAu6StXEjkg62UJGIrRsYYJXUVafhCo9X1zExJuz1",
+        "lastChat":{
+            "uid": "1111b",
+            "datetime": "1614540232269",
+            "chatroomId":"Ux9OiFMj2SVTIUReAu6StXEjkg62UJGIrRsYYJXUVafhCo9X1zExJuz1",
+            "message":"In urna fringilla gravida accumsan magnis cum, ad nisi justo ligula etiam pharetra iaculis, tempor interdum ac nullam cubilia.",
+            "status":"false",
+            "user": {
+                "uid": "UJGIrRsYYJXUVafhCo9X1zExJuz1",
+                "username": "alice"
+            }
+        },
+        "users": [
+            {
+                "image": "https://firebasestorage.googleapis.com/v0/b/remoteers-360d0.appspot.com/o/9BE80FF8-FE98-4BE9-9B89-87C6FB61DD72.jpg?alt=media&token=639aa2fb-2ead-46d4-8364-356149bcc81f",
+                "uid": "Ux9OiFMj2SVTIUReAu6StXEjkg62",
+                "username": "alicia456"
+            },
+            {
+                "image": "",
+                "uid": "UJGIrRsYYJXUVafhCo9X1zExJuz1",
+                "username": "alice"
+            }
+        ],
+        "chats": [
+            {
+                "uid": "1111a",
+                "datetime": "1614540232246",
+                "chatroomId":"Ux9OiFMj2SVTIUReAu6StXEjkg62UJGIrRsYYJXUVafhCo9X1zExJuz1",
+                "message":"Lorem ipsum dolor sit amet consectetur adipiscing elit, blandit libero curae augue risus lobortis placerat feugiat, vulputate elementum posuere quis q",
+                "status":"false",
+                "user": {
+                    "uid": "Ux9OiFMj2SVTIUReAu6StXEjkg62",
+                    "username": "alicia456"
+                }
+            },
+            {
+                "uid": "1111b",
+                "datetime": "1614540232269",
+                "chatroomId":"Ux9OiFMj2SVTIUReAu6StXEjkg62UJGIrRsYYJXUVafhCo9X1zExJuz1",
+                "message":"In urna fringilla gravida accumsan magnis cum, ad nisi justo ligula etiam pharetra iaculis, tempor interdum ac nullam cubilia.",
+                "status":"false",
+                "user": {
+                    "uid": "UJGIrRsYYJXUVafhCo9X1zExJuz1",
+                    "username": "alice"
+                }
+            }
+        ]
+    },
+    {
+        "uid": "Ux9OiFMj2SVTIUReAu6StXEjkg62vbOCP7SwUyVstCyVoDIXGR7Tb4R2",
+        "lastChat":{
+            "uid": "2222b",
+            "datetime": "1614540232269",
+            "chatroomId":"Ux9OiFMj2SVTIUReAu6StXEjkg62vbOCP7SwUyVstCyVoDIXGR7Tb4R2",
+            "message":"vestibulum vulputate per fringilla auctor blandit turpis leo, nisi congue felis ad aliquam mattis enim",
+            "status":"false",
+            "user": {
+                "uid": "vbOCP7SwUyVstCyVoDIXGR7Tb4R2",
+                "username": "andy"
+            }
+        },
+        "users": [
+            {
+                "image": "https://firebasestorage.googleapis.com/v0/b/remoteers-360d0.appspot.com/o/9BE80FF8-FE98-4BE9-9B89-87C6FB61DD72.jpg?alt=media&token=639aa2fb-2ead-46d4-8364-356149bcc81f",
+                "uid": "Ux9OiFMj2SVTIUReAu6StXEjkg62",
+                "username": "alicia456"
+            },
+            {
+                "image": "",
+                "uid": "vbOCP7SwUyVstCyVoDIXGR7Tb4R2",
+                "username": "andy"
+            }
+        ],
+        "chats": [
+            {
+                "uid": "2222a",
+                "datetime": "1614540232246",
+                "chatroomId":"Ux9OiFMj2SVTIUReAu6StXEjkg62vbOCP7SwUyVstCyVoDIXGR7Tb4R2",
+                "message":"Duis ornare ac dapibus senectus a litora penatibus rhoncus magna eros gravida orci nascetur nisi, dignissim eleifend tortor porttitor conse",
+                "status":"false",
+                "user": {
+                    "uid": "Ux9OiFMj2SVTIUReAu6StXEjkg62",
+                    "username": "alicia456"
+                }
+            },
+            {
+                "uid": "2222b",
+                "datetime": "1614540232269",
+                "chatroomId":"Ux9OiFMj2SVTIUReAu6StXEjkg62vbOCP7SwUyVstCyVoDIXGR7Tb4R2",
+                "message":"vestibulum vulputate per fringilla auctor blandit turpis leo, nisi congue felis ad aliquam mattis enim",
+                "status":"false",
+                "user": {
+                    "uid": "vbOCP7SwUyVstCyVoDIXGR7Tb4R2",
+                    "username": "andy"
+                }
+            }
+        ]
+    }
+]

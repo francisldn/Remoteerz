@@ -6,8 +6,25 @@ import {dateTimeFormat} from '../utils/time';
 import { Swipeable } from 'react-native-gesture-handler';
 import GlobalStyles from '../utils/GlobalStyles';
 import { useNavigation } from '@react-navigation/native';
+import { useAuth } from '../utils/useAuth';
+import Avatar from './Avatar';
 
-const MessageBox = ({avatar, name, msg, datetime}) => {
+const MessageBox = ({chatroom}) => {
+    const {uid, lastChat, users} = chatroom;
+    const {currentUserDetails} = useAuth()
+    // function to determine chatUserId
+    const getChatUser = (users) => {
+        if(!currentUserDetails) {
+            console.log('current user not loaded')
+            return
+        }
+        // return user object
+        return users.find(user => user.uid !== currentUserDetails.uid)
+    }
+
+    const chatUser = getChatUser(users);
+    
+    
     const navigation = useNavigation()
     const deleteRef= useRef(null);
     // progress is not used but left it for better understanding of the arguments
@@ -53,86 +70,31 @@ const MessageBox = ({avatar, name, msg, datetime}) => {
         >
             <View
                 ref={deleteRef}
-                style={[styles.boxContainer]} 
+                className="flex flex-row w-full h-[100] border-[#222f9f] border-[0.4] bg-[#e5eeff] items-center"
                 onPress={() => navigation.navigate('UserChat')}
             >
-                <View style={styles.touchContainer}>
-                    <View style={styles.leftContainer}>
-                        <View style={styles.imgContainer}>
-                            <Ionicons name="person" size={24} color="#484646"/>
+                
+                    <View className="flex-1 items-center pl-[4%] flex-row">
+                        <View className="rounded-full self-start items-center content-center w-[50] h-[50]">
+                            <Avatar imageURL={chatUser.image} size={52} update={false} /> 
                         </View>
-                        <View style={styles.textContainer}>
-                            <Text style={[GlobalStyles.CustomFont,styles.name]}>{name}</Text>
-                            <Text style={[GlobalStyles.CustomFont,styles.text]} numberOfLines={1} ellipsizeMode="tail">{msg}</Text>
+                   
+                        <View className="ml-[8%] justify-start self-start overflow-hidden w-[70%]">
+                            <Text style={[GlobalStyles.CustomFont,styles.name]} className="text-[15] text-[#4b4a4a] font-semibold">{chatUser.username}</Text>
+                            <Text style={[GlobalStyles.CustomFont,styles.text]} numberOfLines={1} ellipsizeMode="tail" className="text-[13] text-[#595959] overflow-hidden w-full pt-[3%]">{lastChat.message}</Text>
                         </View>
                     </View>
-                    <View style={styles.dateContainer}>
-                        <Text style={[GlobalStyles.CustomFont,styles.date]}>{dateTimeFormat(Number(datetime))}</Text>
+                    <View className="self-start pt-[6%] pr-[3%]">
+                        <Text style={[GlobalStyles.CustomFont,styles.date]} className="text-[12rem] text-[#595959]">{dateTimeFormat(Number(lastChat.datetime))}</Text>
                     </View>
-                </View>
+            
             </View>
         </Swipeable>
     );
 }
 
 const styles = StyleSheet.create({
-    touchContainer: {
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'row',
-    },
-    boxContainer: {
-        display: 'flex', 
-        flexDirection: 'row',
-        width: '100%',
-        height: 80,
-        borderColor: 'grey',
-        borderWidth: 0.4,
-        backgroundColor: '#fff',
-    },
-    imgContainer: {
-        borderRadius: '100%',
-        alignSelf: 'flex-start',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width:50,
-        height: 50,
-        backgroundColor: 'lightgrey',
-    },
-    leftContainer: {
-        flex: 1,
-        paddingTop: '3%',
-        alignItems: 'center',
-        paddingLeft: '2%',
-        flexDirection: 'row',
-    },
-    textContainer: {
-        marginLeft: '8%',
-        justifyContent: 'flex-start',
-        alignSelf: 'flex-start',
-        overflow: 'hidden',
-        width: '70%',
-    },
-    name: {
-        fontSize: 15,
-        paddingBottom: 3,
-        color: '#292929'
-    },
-    text:{
-        fontSize: 13,
-        color: '#595959',
-        overflow: 'hidden',
-        width: '100%',
-    },
-    dateContainer: {
-        paddingTop: '3%',
-        alignItems: 'center',
-        paddingRight: '3%',
-    },
-    date: {
-        fontSize: 10,
-        color: '#595959',
-    },
+
     deleteContainer: {
         flex:1,
         height:80,

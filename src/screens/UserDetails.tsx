@@ -3,11 +3,12 @@ import { View, StyleSheet } from 'react-native'
 import React from 'react'
 import BottomSheetProfileView from '../components/BottomSheetProfileView';
 import ProfileImageCard from '../components/ProfileImageCard';
-import { placeholderImageURL } from './Profile';
+import { chatService } from '../utils/chatService';
 
 export default function UserDetails({route}) {
+  const {placeholderImages} = chatService()
   const userDetails = route.params;
-  const imageURL = userDetails?.image || placeholderImageURL
+  const imageURL = userDetails?.image || placeholderImages[Math.round(Math.random())]
 
   return (
     <View style={styles.container}>

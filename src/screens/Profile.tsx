@@ -9,12 +9,13 @@ import SettingList from '../components/SettingList'
 import { TouchableRipple } from 'react-native-paper';
 import { useAuth } from '../utils/useAuth';
 import LoadingSpinner from '../components/LoadingSpinner';
-
-export const placeholderImageURL = "https://randomuser.me/api/portraits/women/26.jpg"
+import { genRandBetweenRange } from '../utils/helperFunctions';
+import { chatService } from '../utils/chatService';
 
 export default function Profile() {
   const {currentUserDetails, loading, getUserDetails, setCurrentUserDetails, currentUser} = useAuth()
-  const profileImage = currentUserDetails?.image?.toString()|| placeholderImageURL
+  const {placeholderImages} = chatService();
+  const profileImage = currentUserDetails?.image?.toString()|| placeholderImages[Math.round(Math.random())]
   const navigation = useNavigation()
 
   useEffect(() => {
@@ -32,7 +33,7 @@ export default function Profile() {
     <>
         <ScrollView className="flex-1 ">
             <View className="flex self-center pt-[6%]">
-                <Avatar imageURL={profileImage} size={200}/>
+                <Avatar imageURL={profileImage} size={200} update={false}/>
             </View>
             {!loading && 
             (<View className="flex self-center pt-[2%] pb-[6%]">

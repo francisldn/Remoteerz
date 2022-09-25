@@ -1,12 +1,14 @@
 // @ts-nocheck
-import { TouchableOpacity, Text, ImageBackground, StyleSheet } from 'react-native'
+import { TouchableOpacity, Text, ImageBackground, StyleSheet, View } from 'react-native'
 import React from 'react'
-import { TouchableRipple } from 'react-native-paper'
 import GlobalStyles from '../utils/GlobalStyles'
 import { useNavigation } from '@react-navigation/native'
+import { chatService } from '../utils/chatService';
 
 export default function HangoutCardItem({userDetails}) {
+    const {placeholderImages} = chatService()
     const navigation = useNavigation()
+    const imageURL = userDetails?.image || placeholderImages[Math.round(Math.random())]
 
   return (
     <TouchableOpacity 
@@ -14,8 +16,10 @@ export default function HangoutCardItem({userDetails}) {
         style={styles.imageItem}
         onPress={() => navigation.navigate('UserDetails',userDetails)}
     >
-        <ImageBackground source={{uri: userDetails.image}} style={styles.imageBackground} resizeMode="cover">
-            <Text className="text-lg text-white pt-[65%] pl-[10%]" style={GlobalStyles.CustomFont}>{userDetails.username}</Text>
+        <ImageBackground source={{uri: imageURL}} style={styles.imageBackground} resizeMode="cover">
+            <View className="bg-[#363131] self-start mt-[80%] bg-opacity-40">
+                <Text className="text-md text-white" style={GlobalStyles.CustomFont}>{userDetails.username}</Text>
+            </View>
         </ImageBackground>
     </TouchableOpacity>
   )

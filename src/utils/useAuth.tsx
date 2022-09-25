@@ -109,7 +109,6 @@ export const AuthProvider = ({children}) => {
         const id = currentUser?.uid;
         if(id) {
             getCurrentLocation().then(data => {
-                console.log(data)
                 setCurrentUserLocation(data)
                 updateUserDetails(data, id)
                 .then(() => console.log('user location updated'))
