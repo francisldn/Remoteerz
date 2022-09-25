@@ -1,23 +1,23 @@
 // @ts-nocheck
-import { View, Text, ImageBackground, StyleSheet } from 'react-native'
+import { TouchableOpacity, Text, ImageBackground, StyleSheet } from 'react-native'
 import React from 'react'
 import { TouchableRipple } from 'react-native-paper'
 import GlobalStyles from '../utils/GlobalStyles'
 import { useNavigation } from '@react-navigation/native'
 
-export default function HangoutCardItem({username, image}) {
+export default function HangoutCardItem({userDetails}) {
     const navigation = useNavigation()
 
   return (
-    <TouchableRipple 
+    <TouchableOpacity 
         rippleColor="#fff"
         style={styles.imageItem}
-        onPress={() => navigation.navigate('UserDetails')}
+        onPress={() => navigation.navigate('UserDetails',userDetails)}
     >
-        <ImageBackground source={{uri: image}} style={styles.imageBackground} resizeMode="cover">
-            <Text className="text-lg text-white pt-[65%] pl-[10%]" style={GlobalStyles.CustomFont}>{username}</Text>
+        <ImageBackground source={{uri: userDetails.image}} style={styles.imageBackground} resizeMode="cover">
+            <Text className="text-lg text-white pt-[65%] pl-[10%]" style={GlobalStyles.CustomFont}>{userDetails.username}</Text>
         </ImageBackground>
-    </TouchableRipple>
+    </TouchableOpacity>
   )
 }
 

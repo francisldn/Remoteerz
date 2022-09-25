@@ -21,7 +21,6 @@ export const LocationContext = createContext({
 export async function getCurrentLocation() {
     let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
         return;
       }
       
@@ -50,7 +49,6 @@ export async function getCurrentLocation() {
   }
 
 export const LocationProvider = ({children}) => {
-  const [errorMsg, setErrorMsg] = useState('')
   const [location, setLocation] = useState('')
   const [locationLoading, setLocationLoading] = useState(true)
 
@@ -77,10 +75,9 @@ export const LocationProvider = ({children}) => {
   const memoedValue = useMemo(() => ({
     getCurrentLocation,
     location,
-    errorMsg,
     locationLoading,
     convertAddressToLatLong
-  }),[location, errorMsg, locationLoading])
+  }),[location, locationLoading])
 
   return (
     <LocationContext.Provider value={memoedValue}>

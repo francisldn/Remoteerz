@@ -1,37 +1,47 @@
 // @ts-nocheck
-import React, { useState, useMemo, useEffect } from "react";
-import { StyleSheet, View, Text, ImageBackground } from "react-native";
+import React, { useMemo } from "react";
+import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
-import { useAuth } from "../utils/useAuth";
 import GlobalStyles from "../utils/GlobalStyles";
 import { CapFirstCharacter } from "../utils/helperFunctions";
+import { Ionicons } from '@expo/vector-icons'; 
+import { FontAwesome5 } from "@expo/vector-icons";
+import { useAuth } from "../utils/useAuth";
+import { updateCurrentUserDetails, getCurrentUserDetails } from '../utils/useAuth';
+import { useNavigation } from "@react-navigation/native";
 
-export default function BottomSheetProfileView({userData, setUserData}) {
-    const {currentUserDetails, loading, getCurrentUserDetails} = useAuth()
+export default function BottomSheetProfileView({userDetails, preview}) {
+    const {currentUserDetails, setCurrentUserDetails} = useAuth();
+    const navigation = useNavigation();
+
     const snapPoints = useMemo(() => ["20%", "50%", "90%"], []);
 
-    useEffect(() => {
-        try{
-            getCurrentUserDetails().then(data => setUserData(data));
+    const isFriend = (id:string) => {
+        return currentUserDetails?.myFriends.includes(id) ? true : false;
+    }
+
+    const addToFriends = async (id:string) => {
+        let newFriends = []
+        if (isFriend(id)) {
+            newFriends = currentUserDetails?.myFriends.filter(userId => userId !== id);
+        } else {
+            newFriends = [...currentUserDetails?.myFriends, id];
+        }
+        try {
+            await updateCurrentUserDetails({...currentUserDetails, myFriends: newFriends}, currentUserDetails.uid)
+            const data = await getCurrentUserDetails(currentUserDetails.uid)
+            setCurrentUserDetails(data)
         } catch (error) {
             console.log(error)
         }
-    },[currentUserDetails])
-
+    }
     
-    if(loading && !currentUserDetails) return
+
+
+    if(!userDetails) return
 
     return (
-      <View style={styles.container}>
-        {/* photo card */}
-        <View style={styles.card}>
-            <ImageBackground
-                source={{
-                uri: "https://randomuser.me/api/portraits/women/34.jpg",
-                }}
-                style={styles.image}>
-            </ImageBackground>
-        </View>
+      <>
         {/* bottom sheet */}
         <BottomSheet
           index={0}
@@ -40,12 +50,27 @@ export default function BottomSheetProfileView({userData, setUserData}) {
           handleStyle={{backgroundColor:'#fff', opacity:0.4}}
         >
           <BottomSheetScrollView contentContainerStyle={styles.contentContainer}>
-            <View className="flex flex-row">
-                <Text className="text-white text-3xl pr-5" style={GlobalStyles.CustomFont}>{userData.username}</Text>
-                <Text className="text-white text-3xl" style={GlobalStyles.CustomFont}>{userData.age}</Text>
+            <View className="flex flex-row justify-between">
+                <View className="flex flex-row">
+                    <Text className="text-white text-3xl pr-5" style={GlobalStyles.CustomFont}>{userDetails?.username}</Text>
+                    <Text className="text-white text-3xl" style={GlobalStyles.CustomFont}>{userDetails?.age}</Text>
+                </View>
+                
+                {!preview && 
+                    (<View className="flex flex-row">
+                        <TouchableOpacity onPress={() => addToFriends(userDetails.uid)}>
+                            {isFriend(userDetails.uid) 
+                                ? (<FontAwesome5 name="user-check" size={30} color="#22C55E" style={{paddingRight:'9%'}} />)
+                                : (<Ionicons name="person-add" size={32} color="#b4bcff" style={{paddingRight:'9%'}}/>)
+                            }
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={()=> navigation.navigate('UserChat', userDetails)}>
+                            <Ionicons name="md-chatbox-outline" size={32} color="#b4bcff" style={{paddingRight:'4%'}}/>
+                        </TouchableOpacity>
+                    </View>)}
             </View> 
             <View className="pt-4 pb-16">
-                {userData.online 
+                {userDetails?.online 
                 ? (<Text className="text-green-500" style={GlobalStyles.CustomFont}>Online now</Text>)
                 : (<Text className="text-white" style={GlobalStyles.CustomFont}>Offline</Text>)
                 }
@@ -55,7 +80,7 @@ export default function BottomSheetProfileView({userData, setUserData}) {
                     <Text className="text-gray-300 text-md" style={GlobalStyles.CustomFont}>Interest</Text>
                 </View>
                 <View>
-                    <Text className="text-white text-md" style={GlobalStyles.CustomFont}>{CapFirstCharacter(userData.interests)}</Text>
+                    <Text className="text-white text-md" style={GlobalStyles.CustomFont}>{CapFirstCharacter(userDetails?.interests)}</Text>
                 </View>
             </View>
             <View className="flex flex-row pt-5 pb-5 border-b-[0.3rem] border-opacity-10 border-b-[#aeaeae]">
@@ -63,7 +88,7 @@ export default function BottomSheetProfileView({userData, setUserData}) {
                     <Text className="text-gray-300 text-md" style={GlobalStyles.CustomFont}>Gender</Text>
                 </View>
                 <View>
-                    <Text className="text-white text-md" style={GlobalStyles.CustomFont}>{CapFirstCharacter(userData.gender)}</Text>
+                    <Text className="text-white text-md" style={GlobalStyles.CustomFont}>{CapFirstCharacter(userDetails?.gender)}</Text>
                 </View>
             </View>
             <View className="flex flex-row pt-5 pb-5 border-b-[0.3rem] border-opacity-10 border-b-[#aeaeae]">
@@ -71,7 +96,7 @@ export default function BottomSheetProfileView({userData, setUserData}) {
                     <Text className="text-gray-300 text-md" style={GlobalStyles.CustomFont}>Sexual Orientation</Text>
                 </View>
                 <View>
-                    <Text className="text-white text-md" style={GlobalStyles.CustomFont}>{CapFirstCharacter(userData.sexual_orientation)}</Text>
+                    <Text className="text-white text-md" style={GlobalStyles.CustomFont}>{CapFirstCharacter(userDetails?.sexual_orientation)}</Text>
                 </View>
             </View>
             <View className="flex flex-row pt-5 pb-5 border-b-[0.3rem] border-opacity-10 border-b-[#aeaeae]">
@@ -79,7 +104,7 @@ export default function BottomSheetProfileView({userData, setUserData}) {
                     <Text className="text-gray-300 text-md" style={GlobalStyles.CustomFont}>Job Title</Text>
                 </View>
                 <View>
-                    <Text className="text-white text-md" style={GlobalStyles.CustomFont}>{CapFirstCharacter(userData.job_title)}</Text>
+                    <Text className="text-white text-md" style={GlobalStyles.CustomFont}>{CapFirstCharacter(userDetails?.job_title)}</Text>
                 </View>
             </View>
             <View className="flex flex-row pt-5 pb-5 border-b-[0.3rem] border-opacity-10 border-b-[#aeaeae]">
@@ -87,7 +112,7 @@ export default function BottomSheetProfileView({userData, setUserData}) {
                     <Text className="text-gray-300 text-md" style={GlobalStyles.CustomFont}>Skills</Text>
                 </View>
                 <View>
-                    <Text className="text-white text-md" style={GlobalStyles.CustomFont}>{CapFirstCharacter(userData.skills)}</Text>
+                    <Text className="text-white text-md" style={GlobalStyles.CustomFont}>{CapFirstCharacter(userDetails?.skills)}</Text>
                 </View>
             </View>
             <View className="flex flex-row pt-5 pb-5 border-b-[0.3rem] border-opacity-10 border-b-[#aeaeae]">
@@ -95,7 +120,7 @@ export default function BottomSheetProfileView({userData, setUserData}) {
                     <Text className="text-gray-300 text-md" style={GlobalStyles.CustomFont}>Countries Travelled</Text>
                 </View>
                 <View>
-                    <Text className="text-white text-md" style={GlobalStyles.CustomFont}>{CapFirstCharacter(userData.countries_travelled)}</Text>
+                    <Text className="text-white text-md" style={GlobalStyles.CustomFont}>{CapFirstCharacter(userDetails?.countries_travelled)}</Text>
                 </View>
             </View>
             <View className="flex flex-row pt-5 pb-5 border-b-[0.3rem] border-opacity-10 border-b-[#aeaeae]">
@@ -103,7 +128,7 @@ export default function BottomSheetProfileView({userData, setUserData}) {
                     <Text className="text-gray-300 text-md" style={GlobalStyles.CustomFont}>Countries Lived</Text>
                 </View>
                 <View>
-                    <Text className="text-white text-md" style={GlobalStyles.CustomFont}>{CapFirstCharacter(userData.countries_lived)}</Text>
+                    <Text className="text-white text-md" style={GlobalStyles.CustomFont}>{CapFirstCharacter(userDetails?.countries_lived)}</Text>
                 </View>
             </View>
             <View className="flex flex-row pt-5 pb-5 border-b-[0.3rem] border-opacity-10 border-b-[#aeaeae]">
@@ -111,12 +136,12 @@ export default function BottomSheetProfileView({userData, setUserData}) {
                     <Text className="text-gray-300 text-md" style={GlobalStyles.CustomFont}>Favourite Cities</Text>
                 </View>
                 <View>
-                    <Text className="text-white text-md" style={GlobalStyles.CustomFont}>{CapFirstCharacter(userData.favourite_cities)}</Text>
+                    <Text className="text-white text-md" style={GlobalStyles.CustomFont}>{CapFirstCharacter(userDetails?.favourite_cities)}</Text>
                 </View>
             </View>
           </BottomSheetScrollView>
         </BottomSheet>
-      </View>
+      </>
     );
   };
   

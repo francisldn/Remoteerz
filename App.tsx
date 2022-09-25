@@ -1,5 +1,6 @@
 // @type-nocheck
-import { StyleSheet, Text, View, Pressable, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, Text, Pressable } from 'react-native';
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -14,7 +15,7 @@ import Chatroom from './src/screens/Chatroom';
 import EditProfile from './src/screens/EditProfile';
 import PreviewProfile from './src/screens/PreviewProfile';
 import UserDetails from './src/screens/UserDetails';
-import Logout from './src/screens/Logout';
+import UserChat from './src/screens/UserChat';
 import { AuthProvider } from './src/utils/useAuth';
 import { LocationProvider } from './src/utils/useLocation';
 import AccountSettings from './src/screens/AccountSettings';
@@ -28,13 +29,9 @@ export default function App() {
       <LocationProvider>
       <NavigationContainer>
         <Stack.Navigator>
-            {/* <Stack.Screen
+            <Stack.Screen
               name="Login"
               component={Login}
-            />
-            <Stack.Screen
-              name="Logout"
-              component={Logout}
             />
             <Stack.Screen
               name="SignUp"
@@ -65,7 +62,7 @@ export default function App() {
               options= {() => ({
                 headerBackVisible:false,
               })}
-            /> */}
+            />
           <Stack.Screen
             name="Hangouts"
             component={Hangouts}
@@ -81,10 +78,18 @@ export default function App() {
             })}
           />
           <Stack.Screen
+            name="UserChat"
+            component={UserChat}
+            options= {() => ({
+              title:"",
+            })}
+          />
+          <Stack.Screen
             name="Chatroom"
             component={Chatroom}
             options= {() => ({
               headerBackVisible:false,
+              title:"Chats",
             })}
           />
           <Stack.Screen
@@ -116,9 +121,3 @@ export default function App() {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-   
-  },
-});

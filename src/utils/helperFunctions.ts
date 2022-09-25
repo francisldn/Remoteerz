@@ -1,6 +1,6 @@
 // @ts-nocheck
-import { getStorage, ref, uploadBytes, getDownloadURL, uploadBytesResumable } from "firebase/storage";
-import 'firebase/compat/storage'
+import { getStorage, ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
+import { updateCurrentUserDetails } from './useAuth';
 
 export const CapFirstCharacter = (str:string) => {
     if (!str) return ''
@@ -8,21 +8,17 @@ export const CapFirstCharacter = (str:string) => {
     return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
-export const uploadImageToFirestore = async (imgURL) => {
+export const uploadImageToFirestore = async (imgURL, userId) => {
     const storage = getStorage(); //storage instance
     // convert imgURL to Blob (bytes)
     try {
         const response = await fetch(imgURL);
         const bytes = await response.blob();
+        console.log(bytes)
         const filename= imgURL.substring(imgURL.lastIndexOf('/')+1);
-        const imgType = filename.split('.')[1]
-        const metadata = {contentType: `image/${imgType}`}
         const storageRef = ref(storage, filename)
-        // await uploadBytesResumable(storageRef, bytes, metadata).then(snapshot => {
-        //     console.log(snapshot);
-        //     console.log('upload image successful');
-        // })
-        const uploadTask = uploadBytesResumable(storageRef, filename)
+
+        const uploadTask = uploadBytesResumable(storageRef, bytes)
 
         uploadTask.on('state_changed', 
             (snapshot) => {
@@ -48,7 +44,9 @@ export const uploadImageToFirestore = async (imgURL) => {
                 // For instance, get the download URL: https://firebasestorage.googleapis.com/...
                 getDownloadURL(uploadTask.snapshot.ref)
                     .then((downloadURL) => {
-                        return downloadURL;
+                        updateCurrentUserDetails({image: downloadURL}, userId)
+                            .then(() => console.log('image url successfully updated'))
+                            .catch((error) => console.log(error))
                     })
                     .catch(error => {
                         console.log(error)

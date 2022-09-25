@@ -8,24 +8,25 @@ import { useNavigation } from '@react-navigation/native';
 import SettingList from '../components/SettingList'
 import { TouchableRipple } from 'react-native-paper';
 import { useAuth } from '../utils/useAuth';
+import LoadingSpinner from '../components/LoadingSpinner';
 
-const placeholderImageURL = "https://firebasestorage.googleapis.com/v0/b/remoteers-360d0.appspot.com/o/icons8-selfies-100.png?alt=media&token=da1fef51-7ede-4f32-a559-1270ba1fe95f"
+export const placeholderImageURL = "https://randomuser.me/api/portraits/women/26.jpg"
 
 export default function Profile() {
-  const {currentUserDetails, loading, getCurrentUserDetails} = useAuth()
-  const [userData, setUserData] = useState(currentUserDetails)
-  const [profileImage, setProfileImage] = useState(placeholderImageURL)
+  const {currentUserDetails, loading, getCurrentUserDetails, setCurrentUserDetails, currentUser} = useAuth()
+  const profileImage = currentUserDetails?.image?.toString()|| placeholderImageURL
   const navigation = useNavigation()
 
   useEffect(() => {
     try {
-        getCurrentUserDetails().then((data) => setUserData(data))
+        getCurrentUserDetails(currentUser.uid).then((data) => setCurrentUserDetails(data))
+
     } catch(error) {
         console.log(error)
     }
-  },[currentUserDetails])
+  },[])
   
-  if(loading && !currentUserDetails) return
+  if(loading && !currentUserDetails) return <LoadingSpinner />
 
   return (
     <>
@@ -39,14 +40,14 @@ export default function Profile() {
                     className="text-center text-2xl text-[#141bab] font-bold"
                     style={GlobalStyles.CustomFont}
                 >
-                    {userData && userData.username}
+                    {currentUserDetails && currentUserDetails.username}
                 </Text>
             </View>)}
             {/* Edit Profile and Show Profile */}
             <View className="flex flex-row justify-around w-full bg-white h-[60] items-center">
                 <TouchableRipple 
                     className="w-[50%] border-r-[1rem] h-full justify-center border-r-[#b6b6b6]"
-                    onPress={() => navigation.navigate('EditProfile',{userData, setUserData})}
+                    onPress={() => navigation.navigate('EditProfile')}
                     rippleColor="rgba(0, 0, 0, .32)"
                 >
                    
@@ -59,7 +60,7 @@ export default function Profile() {
                 </TouchableRipple>
                 <TouchableRipple 
                     className="w-[50%] h-full justify-center"
-                    onPress={() => navigation.navigate('PreviewProfile',{userData, setUserData})}
+                    onPress={() => navigation.navigate('PreviewProfile')}
                 >
                      <Text 
                             className="text-xl text-center"

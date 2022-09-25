@@ -1,10 +1,13 @@
 import { View, Text } from 'react-native'
-import React from 'react'
+import React from 'react';
+import AuthButton from '../components/AuthButton';
+import { useAuth } from '../utils/useAuth';
 
 export default function AccountSettings() {
+  const {logout} = useAuth();
   return (
     <View>
-      <Text>AccountSettings</Text>
+      <AuthButton btnText={"Logout"} btnAction={async () => await logout()} />
     </View>
   )
 }

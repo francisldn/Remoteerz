@@ -23,6 +23,31 @@ import {getCurrentLocation} from './useLocation'
 //     loading: boolean
 // }
 
+export const updateCurrentUserDetails = async (userData, userId) => {
+    if(userId) {
+        const docRef = doc(db,"Users",userId)
+        try {
+            await setDoc(docRef, userData, {merge:true})
+        } catch (error) {
+            console.log(error)
+            throw new Error(error)
+        }
+    } else {
+        console.log('user id undefined')
+    }
+}
+
+export const getCurrentUserDetails = async (userId) => {
+    const docRef = doc(db,"Users",userId)
+    try {
+        const userDetails = await getDoc(docRef)
+        return userDetails.data();
+    } catch (error) {
+        console.log(error)
+        throw new Error(error)
+    }
+}
+
 const AuthContext = createContext<AuthProps>({
     user:null,
     signUp: async () => {},
@@ -44,58 +69,53 @@ export const AuthProvider = ({children}) => {
     const [userLocation, setUserLocation] = useState('')
 
     // get user auth when user signs up
+    // then retrieve user location and update
     useEffect(() => {
         // redirect user to login page if user is not signed up
         const unsubscribe = onAuthStateChanged(auth, (user) => {
-                    if(user) {
-                        setCurrentUser(user)
-                    } else {
-                        setCurrentUser(null)
-                    }
-                 })
+            if(user) {
+                setCurrentUser(user)
+                // retrieve user location
+                const id = user.uid
+                getCurrentLocation()
+                    .then(data => {
+                        setUserLocation(data)
+                        if(id) {
+                            updateCurrentUserDetails(data, id)
+                                .then(() => console.log('user location updated'))
+                                .catch(error => console.log('failed to update user location'))
+                            
+                            updateUserOnlineStatus()
+                                .then(() => console.log('user online status updated'))   
+                                .catch((error) => console.log('failed to update online status')) 
+                            
+                            getCurrentUserDetails(id)
+                            .then(data => {
+                                setCurrentUserDetails(data)
+                                console.log('user details retrieved successfully')
+                            })
+                            .catch(error => console.log('failed to retrieve user details'))
+                        }
+                })
+                
+            } else {
+                setCurrentUser(null)
+            }
+        })
+
         setInitialLoading(false)
         return unsubscribe;
-    }, [auth])
+    }, [])
 
-    // retrieve user location and update in database
-    useEffect(() => {
-        (async() => {
-            try {
-                const data = await getCurrentLocation()
-                setUserLocation(data)
-                await updateCurrentUserDetails(data)
-                await updateUserOnlineStatus();
-                console.log('user location updated successfully')
-            } catch (error) {
-                console.log('failed to update user location')
-                console.log(error)
-            }
-        })()
-    },[auth])
-
-    // retrieve user details from database - to display
-    useEffect(() => {
-        (async() => {
-            try {
-                const data = await getCurrentUserDetails()
-                setCurrentUserDetails(data)
-                console.log("user data retrieved successfully")
-            }catch (error) {
-                console.log('failed to retrieve user data')
-                console.log(error)
-            }
-        })()
-    },[auth])
 
     // sign up with email and password
     const signUp = async (email, password) => {
         const username= email.split('@')[0]
         setLoading(true)
         try {
-            await createUserWithEmailAndPassword(auth,email,password)
-            .then(userCredential => {
-                setCurrentUser(userCredential.user)
-                setDoc(doc(db, 'Users', userCredential.user.uid),
+            const userCredential = await createUserWithEmailAndPassword(auth,email,password)
+            setCurrentUser(userCredential.user)
+            await setDoc(doc(db, 'Users', userCredential.user.uid),
                 {
                     uid: userCredential.user && userCredential.user.uid,
                     email: userCredential.user && userCredential.user.email,
@@ -122,10 +142,7 @@ export const AuthProvider = ({children}) => {
                     myFriends:[],
                     chatrooms:[],
                 })
-                .then(() => {console.log('successful')})
-                .catch((error) => {throw new Error(error)})
-            })
-            
+            console.log('successfully add user to database')
 
         } catch (error) {
             if(error.code.includes("email-already-in-use")) {
@@ -192,17 +209,7 @@ export const AuthProvider = ({children}) => {
         setLoading(false)
     }
     
-    const getCurrentUserDetails = async () => {
-        const id = auth.currentUser.uid
-        const docRef = doc(db,"Users",id)
-        try {
-            const userDetails = await getDoc(docRef)
-            return userDetails.data();
-        } catch (error) {
-            console.log(error)
-            throw new Error(error)
-        }
-    }
+    
     const updateUserOnlineStatus = async () => {
         const id = auth.currentUser.uid
         if(id) {
@@ -232,20 +239,7 @@ export const AuthProvider = ({children}) => {
         }
     }
 
-    const updateCurrentUserDetails = async (userData) => {
-        const id = auth.currentUser.uid
-        if(id) {
-            const docRef = doc(db,"Users",id)
-            try {
-                await setDoc(docRef, userData, {merge:true})
-            } catch (error) {
-                console.log(error)
-                throw new Error(error)
-            }
-        } else {
-            console.log('user id undefined')
-        }
-    }
+    
 
     // more performant
     // similar to useEffect but only re-compute if one of the dependencies changes
@@ -261,6 +255,7 @@ export const AuthProvider = ({children}) => {
         setLoading,
         currentUserDetails,
         updateCurrentUserDetails,
+        setCurrentUserDetails,
         getCurrentUserDetails,
         userLocation
     }), [currentUserDetails,initialLoading,loading,error, userLocation])

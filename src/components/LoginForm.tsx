@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { View, Text, TouchableWithoutFeedback,Keyboard, Pressable, Alert } from 'react-native'
+import { View, Text, TouchableOpacity, Alert } from 'react-native'
 import React from 'react'
 import FormInputField from './FormInputField'
 import AuthButton from './AuthButton'
@@ -96,9 +96,9 @@ export default function LoginForm() {
               btnAction={() => navigation.navigate('SignUp')}
             />
             
-            <Pressable onPress={() => navigation.navigate('ForgotPassword')}>
+            <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
               <Text className="p-8 text-center font-bold text-blue-500">Forgot Password?</Text>
-            </Pressable>
+            </TouchableOpacity>
 
         </View>
     </View>

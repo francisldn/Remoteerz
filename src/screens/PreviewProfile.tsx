@@ -1,9 +1,10 @@
 // @ts-nocheck
-import { View, Text } from 'react-native'
-import React, {useState} from 'react'
-import LargeAvatar from '../components/LargeAvatar';
+import { View, StyleSheet } from 'react-native'
+import React from 'react'
 import BottomSheetProfileView from '../components/BottomSheetProfileView';
+import ProfileImageCard from '../components/ProfileImageCard';
 import { useAuth } from '../utils/useAuth';
+import { placeholderImageURL } from './Profile';
 
 const initialValues = {
   username: 'Alicia',
@@ -19,13 +20,20 @@ const initialValues = {
   favourite_cities:'Barcelona'
 }
 
-export default function PreviewProfile({route}) {
-  const {userData, setUserData} = route.params
-
-  
+export default function PreviewProfile() {
+  const {currentUserDetails} = useAuth()
+  const imageURL = currentUserDetails?.image || placeholderImageURL
   return (
-    <>
-      <BottomSheetProfileView userData={userData} setUserData={setUserData}/>
-    </>
+    <View style={styles.container}>
+      <ProfileImageCard imageURL={imageURL}/>
+      <BottomSheetProfileView userDetails={currentUserDetails} preview={true}/>
+    </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor:"#c3d5fe"
+  },
+})

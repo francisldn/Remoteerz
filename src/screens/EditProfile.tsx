@@ -22,27 +22,17 @@ import BottomSheet, {BottomSheetView, useBottomSheetSpringConfigs} from '@gorhom
 import * as ImagePicker from 'expo-image-picker';
 import { uploadImageToFirestore } from '../utils/helperFunctions';
 
-const placeholderImageURL = "https://firebasestorage.googleapis.com/v0/b/remoteers-360d0.appspot.com/o/icons8-selfies-100.png?alt=media&token=da1fef51-7ede-4f32-a559-1270ba1fe95f"
+import { placeholderImageURL } from './Profile';
+import LoadingSpinner from '../components/LoadingSpinner';
 
-export default function EditProfile({route}) {
-  const {userData, setUserData} = route.params
-  const {currentUserDetails, loading, updateCurrentUserDetails, getCurrentUserDetails} = useAuth()
+export default function EditProfile() {
+  const {currentUserDetails, loading, setCurrentUserDetails, updateCurrentUserDetails, getCurrentUserDetails} = useAuth()
   const navigation = useNavigation()
-  const [displayValue, setDisplayValue] = useState(CapFirstCharacter(userData.display_status) || 'Public' );
-  const [genderValue, setGenderValue] = useState(CapFirstCharacter(userData.gender)|| 'Male');
-  const [image, setImage] = useState(userData.image || placeholderImageURL)
+  const [displayValue, setDisplayValue] = useState(CapFirstCharacter(currentUserDetails?.display_status) || 'Public' );
+  const [genderValue, setGenderValue] = useState(CapFirstCharacter(currentUserDetails?.gender)|| 'Male');
+  const [image, setImage] = useState(currentUserDetails?.image || placeholderImageURL)
   const [isOpen, setIsOpen] = useState(false);
-  const [age, setAge] = useState(userData.age?.toString() || '18')
-
-  // get user details
-  useEffect(() => {
-    console.log(userData.image)
-    try {
-        getCurrentUserDetails().then(data => setUserData(data));
-    } catch (error) {
-        console.log(error)
-    }
-  },[currentUserDetails])
+  const [age, setAge] = useState(currentUserDetails?.age?.toString() || '18')
 
   // snapPoints for bottomsheet
   const snapPoints = ['35%']
@@ -78,7 +68,7 @@ export default function EditProfile({route}) {
                 // this does not work --> to check
                 const url = await uploadImageToFirestore(result.uri)
                 const imageData = {image: url}
-                await updateCurrentUserDetails(imageData)
+                await updateCurrentUserDetails(imageData, currentUserDetails.uid)
                     .then(() => console.log('image successfully updated'))
                     .catch((error) => console.log(error))
                 setIsOpen(false)
@@ -101,20 +91,25 @@ export default function EditProfile({route}) {
             let result = await ImagePicker.launchImageLibraryAsync({
                 mediaTypes: ImagePicker.MediaTypeOptions.Images,
                 allowsEditing: true,
-                aspect: [16, 9],
-                quality: 0.5,
-                allowsMultipleSelection:false
+                base64:false,
+                exif:false,
+                quality: 0,
+                allowsMultipleSelection:false, 
+                selectionLimit: 1,
+
             });
 
             if (!result.cancelled) {
                 setImage(result.uri);
-                const url = await uploadImageToFirestore(result.uri)
-                const imageData = {image: url}
-                await updateCurrentUserDetails(imageData)
-                    .then(() => console.log('image successfully updated'))
+                await uploadImageToFirestore(result.uri, currentUserDetails?.uid)
+                
+                getCurrentUserDetails(currentUserDetails?.uid)
+                    .then(newData => {
+                        if(newData) setCurrentUserDetails(newData)
+                        console.log('user state updated')
+                    })
                     .catch((error) => console.log(error))
-                const newData = await getCurrentUserDetails();
-                setUserData(newData);
+                
 
                 setIsOpen(false)
             }
@@ -136,88 +131,91 @@ export default function EditProfile({route}) {
         .test('len', 'at least 4 characters', val => val.toString().length >= 4)
         .test('len', 'max 10 characters', val => val.toString().length <= 10)
         .required('Username is required')
-        .default(userData.username || ''),
+        .default(currentUserDetails.username || ''),
     about: yup
         .string()
         .max(500, "Max 500 characters allowed")
-        .default(userData.about || '')
+        .default(currentUserDetails.about || '')
         .optional(),
     interests: yup
         .string()
         .max(100, "Max 100 characters allowed")
-        .default(userData.interests || '')
+        .default(currentUserDetails.interests || '')
         .optional(),
     display_status: yup
         .string()
         .required()
         .oneOf(['public', 'private'])
-        .default(userData.display_status || 'Public'), //public (true), private (false)
+        .default(currentUserDetails.display_status || 'Public'), //public (true), private (false)
     sexual_orientation:yup
         .string()
         .oneOf(['gay', 'straight','lesbian','bisexual','other'])
-        .default(userData.sexual_orientation || '')
+        .default(currentUserDetails.sexual_orientation || '')
         .optional(), //gay, straight, lesbian, bisexual, asexual, curious, none of the above
     age: yup.number('Must be a number')
         .min(16, 'You are not old enough to use this app')
-        .default(userData.age || 16)
+        .default(currentUserDetails.age || 16)
         .optional(),
     gender: yup
         .string()
         .oneOf(['male','female','other'])
-        .default(userData.gender|| 'male')
+        .default(currentUserDetails.gender|| 'male')
         .optional(), //male, female, prefer not to say
     job_title: yup
         .string()
-        .default(userData.job_title || '')
+        .default(currentUserDetails.job_title || '')
         .optional(),
     skills: yup
         .string()
-        .default(userData.skills || '')
+        .default(currentUserDetails.skills || '')
         .optional(),
     countries_travelled: yup
         .string()
         .max(100, "Max 100 characters allowed")
-        .default(userData.countries_travelled || '')
+        .default(currentUserDetails.countries_travelled || '')
         .optional(),
     countries_lived: yup
         .string()
         .max(100, "Max 100 characters allowed")
-        .default(userData.countries_lived || '')
+        .default(currentUserDetails.countries_lived || '')
         .optional(),
     favourite_cities: yup
         .string()
-        .default(userData.favourite_cities || '')
+        .default(currentUserDetails.favourite_cities || '')
         .optional()
 })
 
   const {handleSubmit, handleBlur, errors, setValues, values, touched} = useFormik({
     initialValues: {
-        username: userData.username || '',
-        about: userData.about || '',
-        interests: userData.interests || '',
-        display_status: userData.display_status || 'public', //public (true), private (false)
-        sexual_orientation: userData.sexual_orientation || 'straight', //gay, straight, lesbian, bisexual, asexual, curious, none of the above
-        age: userData.age || '',
-        gender: userData.gender|| 'male', //male, female, prefer not to say
-        job_title: userData.job_title || '',
-        skills: userData.skills || '',
-        countries_travelled: userData.countries_travelled || '',
-        countries_lived: userData.countries_lived || '',
-        favourite_cities: userData.favourite_cities || '',
+        username: currentUserDetails.username || '',
+        about: currentUserDetails.about || '',
+        interests: currentUserDetails.interests || '',
+        display_status: currentUserDetails.display_status || 'public', //public (true), private (false)
+        sexual_orientation: currentUserDetails.sexual_orientation || 'straight', //gay, straight, lesbian, bisexual, asexual, curious, none of the above
+        age: currentUserDetails.age || '',
+        gender: currentUserDetails.gender|| 'male', //male, female, prefer not to say
+        job_title: currentUserDetails.job_title || '',
+        skills: currentUserDetails.skills || '',
+        countries_travelled: currentUserDetails.countries_travelled || '',
+        countries_lived: currentUserDetails.countries_lived || '',
+        favourite_cities: currentUserDetails.favourite_cities || '',
 
     },
     validationSchema: ProfileSchema,
     onSubmit: async (values) => {
         try {
-            setUserData(values);
-            await updateCurrentUserDetails(values);
-            const data = await getCurrentUserDetails();
-            setUserData(data)
+            setCurrentUserDetails(values);
+            await updateCurrentUserDetails(values, currentUserDetails.uid);
+            const data = await getCurrentUserDetails(currentUserDetails?.uid);
+            setCurrentUserDetails(data)
+            console.log('data upload successful')
         } catch(error) {
             Alert.alert("Changes are not saved. Please try again.")
         }
     }
   })
+
+  if(loading) return <LoadingSpinner/>
 
 
   return (
@@ -233,13 +231,13 @@ export default function EditProfile({route}) {
             >
                 <Avatar imageURL={image} size={200}/>
             </TouchableRipple>
-            {!loading && 
+            {currentUserDetails && 
             (<View className="flex self-center pt-[2%] pb-[6%]">
                 <Text 
                     className="text-center text-2xl text-[#141bab] font-bold"
                     style={GlobalStyles.CustomFont}
                 >
-                    {userData && userData.username}
+                    {currentUserDetails.username}
                 </Text>
             </View>)}
 
@@ -259,7 +257,7 @@ export default function EditProfile({route}) {
                 </TouchableRipple>
                 <TouchableRipple 
                     className="w-[50%] border-slate-300 border-r-[1rem] h-full justify-center bg-white"
-                    onPress={() => navigation.navigate('PreviewProfile', {userData, setUserData})}
+                    onPress={() => navigation.navigate('PreviewProfile')}
                 >
                 <View className="flex flex-row justify-between">
                     <Text 
@@ -290,7 +288,7 @@ export default function EditProfile({route}) {
                         })}}
                     onBlur = {() => handleBlur('username')}
                     autoCapitalize = {"none"}
-                    value = {values.username ||userData.username }
+                    value = {values.username ||currentUserDetails.username }
                     multiline = {false}
                     textContentType={"username"}
                 />
@@ -309,7 +307,7 @@ export default function EditProfile({route}) {
                         })}}
                     onBlur = {() => handleBlur('about')}
                     autoCapitalize = {"none"}
-                    value = { values.about || userData.about }
+                    value = { values.about || currentUserDetails.about }
                     multiline = {true}
                     height={100}
                 />
@@ -334,7 +332,7 @@ export default function EditProfile({route}) {
                         })}}
                     onBlur = {() => handleBlur('interests')}
                     autoCapitalize = {"none"}
-                    value = { values.interests || userData.interests }
+                    value = { values.interests || currentUserDetails.interests }
                     multiline = {true}
                     height={60}
                 />
@@ -386,7 +384,7 @@ export default function EditProfile({route}) {
 
                 {/* Sexual orientation */}
                 <ProfileFormInputLabel inputLabel='SEXUAL ORIENTATION'/>
-                <ProfileInputRadioButton setValues={setValues} defaultValue={CapFirstCharacter(userData.sexual_orientation) || 'Straight'}/>
+                <ProfileInputRadioButton setValues={setValues} defaultValue={CapFirstCharacter(currentUserDetails.sexual_orientation) || 'Straight'}/>
                 {errors.sexual_orientation && <Text className="text-red-500 pl-[4%] pb-[2%]">{errors.sexual_orientation}</Text>}
                 
                 {/* Job Title */}
@@ -403,7 +401,7 @@ export default function EditProfile({route}) {
                         })}}
                     onBlur = {() => handleBlur('job_title')}
                     autoCapitalize = {"none"}
-                    value = {  values.job_title || userData.job_title }
+                    value = {  values.job_title || currentUserDetails.job_title }
                     multiline = {true}
                     height={40}
                     textContentType={"jobTitle"}
@@ -425,7 +423,7 @@ export default function EditProfile({route}) {
                         })}}
                     onBlur = {() => handleBlur('skills')}
                     autoCapitalize = {"none"}
-                    value = {values.skills || userData.skills }
+                    value = {values.skills || currentUserDetails.skills }
                     multiline = {true}
                     height={60}
                 />
@@ -445,7 +443,7 @@ export default function EditProfile({route}) {
                         })}}
                     onBlur = {() => handleBlur('countries_travelled')}
                     autoCapitalize = {"none"}
-                    value = {values.countries_travelled || userData.countries_travelled }
+                    value = {values.countries_travelled || currentUserDetails.countries_travelled }
                     multiline = {true}
                     height={60}
                     textContentType={"countryName"}
@@ -466,7 +464,7 @@ export default function EditProfile({route}) {
                         })}}
                     onBlur = {() => handleBlur('countries_travelled')}
                     autoCapitalize = {"none"}
-                    value = { values.countries_lived || userData.countries_lived }
+                    value = { values.countries_lived || currentUserDetails.countries_lived }
                     multiline = {true}
                     height={60}
                     textContentType={"countryName"}
@@ -487,7 +485,7 @@ export default function EditProfile({route}) {
                         })}}
                     onBlur = {() => handleBlur('favourite_cities')}
                     autoCapitalize = {"none"}
-                    value = { values.favourite_cities || userData.favourite_cities }
+                    value = { values.favourite_cities || currentUserDetails.favourite_cities }
                     multiline = {true}
                     height={60}
                     textContentType={"addressCity"}
