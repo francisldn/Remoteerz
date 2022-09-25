@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { getStorage, ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
-import { updateCurrentUserDetails } from './useAuth';
+import { updateUserDetails } from './useAuth';
 
 export const CapFirstCharacter = (str:string) => {
     if (!str) return ''
@@ -44,7 +44,7 @@ export const uploadImageToFirestore = async (imgURL, userId) => {
                 // For instance, get the download URL: https://firebasestorage.googleapis.com/...
                 getDownloadURL(uploadTask.snapshot.ref)
                     .then((downloadURL) => {
-                        updateCurrentUserDetails({image: downloadURL}, userId)
+                        updateUserDetails({image: downloadURL}, userId)
                             .then(() => console.log('image url successfully updated'))
                             .catch((error) => console.log(error))
                     })

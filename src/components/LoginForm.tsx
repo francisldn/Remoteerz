@@ -38,7 +38,7 @@ export default function LoginForm() {
                     await login(values.email, values.password)
                     navigation.navigate('Profile');
                 } catch (err){
-                    Alert.alert(`${err.message} Please try again.`)
+                    Alert.alert(`${err.message}`)
                     navigation.navigate('Login')
                     setLoading(false)
                 }

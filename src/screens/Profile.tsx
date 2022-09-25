@@ -13,13 +13,13 @@ import LoadingSpinner from '../components/LoadingSpinner';
 export const placeholderImageURL = "https://randomuser.me/api/portraits/women/26.jpg"
 
 export default function Profile() {
-  const {currentUserDetails, loading, getCurrentUserDetails, setCurrentUserDetails, currentUser} = useAuth()
+  const {currentUserDetails, loading, getUserDetails, setCurrentUserDetails, currentUser} = useAuth()
   const profileImage = currentUserDetails?.image?.toString()|| placeholderImageURL
   const navigation = useNavigation()
 
   useEffect(() => {
     try {
-        getCurrentUserDetails(currentUser.uid).then((data) => setCurrentUserDetails(data))
+        getUserDetails(currentUser.uid).then((data) => setCurrentUserDetails(data))
 
     } catch(error) {
         console.log(error)

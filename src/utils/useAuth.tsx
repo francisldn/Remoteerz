@@ -12,7 +12,7 @@ import {
 import {db} from './firebase/firebaseConfig';
 import {auth} from './firebase/firebaseConfig';
 import { doc, getDoc, setDoc} from 'firebase/firestore';
-import {getCurrentLocation} from './useLocation'    
+import {useLocation} from './useLocation'    
 // interface AuthProps {
 //     user:User,
 //     signUp: () => {},
@@ -23,7 +23,8 @@ import {getCurrentLocation} from './useLocation'
 //     loading: boolean
 // }
 
-export const updateCurrentUserDetails = async (userData, userId) => {
+
+export const updateUserDetails = async (userData, userId) => {
     if(userId) {
         const docRef = doc(db,"Users",userId)
         try {
@@ -37,7 +38,7 @@ export const updateCurrentUserDetails = async (userData, userId) => {
     }
 }
 
-export const getCurrentUserDetails = async (userId:string) => {
+export const getUserDetails = async (userId:string) => {
     const docRef = doc(db,"Users",userId)
     try {
         const userDetails = await getDoc(docRef)
@@ -49,55 +50,51 @@ export const getCurrentUserDetails = async (userId:string) => {
 }
 
 const AuthContext = createContext<AuthProps>({
-    user:null,
+    currentUser: null,
     signUp: async () => {},
     login: async () => {},
     logout: async () => {},
     forgotPassword: async() => {},
+    loading: false,
+    initialLoading:false,
     error: null,
-    initialloading: true,
-    loading:false,
+    setLoading: ()=> {},
+    currentUserDetails:null,
+    updateUserDetails: ()=> {},
+    setCurrentUserDetails: () => {},
+    getUserDetails: () => {}
 })
 
 export const AuthProvider = ({children}) => {
     const [loading, setLoading] = useState(false)
-    const [initialLoading, setInitialLoading] = useState(true)
+    const [initialLoading, setInitialLoading] = useState(false)
     // firebase user
     const [currentUserDetails, setCurrentUserDetails] = useState(null)
     const [currentUser, setCurrentUser] = useState(null) 
     const [error, setError] = useState('')
-    const [userLocation, setUserLocation] = useState('')
+    const {currentUserLocation, setCurrentUserLocation, locationLoading, setLocationLoading, getCurrentLocation} = useLocation()
 
     // get user auth when user signs up
     // then retrieve user location and update
     useEffect(() => {
+        setInitialLoading(true);
         // redirect user to login page if user is not signed up
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if(user) {
                 setCurrentUser(user)
-                // retrieve user location
                 const id = user.uid
-                getCurrentLocation()
+                if(id) {
+                    updateUserOnlineStatus()
+                        .then(() => console.log('user online status updated'))   
+                        .catch((error) => console.log('failed to update online status')) 
+                    
+                    getUserDetails(id)
                     .then(data => {
-                        setUserLocation(data)
-                        if(id) {
-                            updateCurrentUserDetails(data, id)
-                                .then(() => console.log('user location updated'))
-                                .catch(error => console.log('failed to update user location'))
-                            
-                            updateUserOnlineStatus()
-                                .then(() => console.log('user online status updated'))   
-                                .catch((error) => console.log('failed to update online status')) 
-                            
-                            getCurrentUserDetails(id)
-                            .then(data => {
-                                setCurrentUserDetails(data)
-                                console.log('user details retrieved successfully')
-                            })
-                            .catch(error => console.log('failed to retrieve user details'))
-                        }
-                })
-                
+                        setCurrentUserDetails(data)
+                        console.log('user details retrieved successfully')
+                    })
+                    .catch(error => console.log('failed to retrieve user details'))
+                }
             } else {
                 setCurrentUser(null)
             }
@@ -107,6 +104,20 @@ export const AuthProvider = ({children}) => {
         return unsubscribe;
     }, [])
 
+    useEffect(() => {
+        setLocationLoading(true)
+        const id = currentUser?.uid;
+        if(id) {
+            getCurrentLocation().then(data => {
+                console.log(data)
+                setCurrentUserLocation(data)
+                updateUserDetails(data, id)
+                .then(() => console.log('user location updated'))
+                .catch(error => console.log('failed to update user location'))
+            })
+        }
+        setLocationLoading(false)
+    },[currentUser]);
 
     // sign up with email and password
     const signUp = async (email, password) => {
@@ -165,14 +176,16 @@ export const AuthProvider = ({children}) => {
             setCurrentUser(auth.currentUser)
         } catch (error) {
             if(error.code.includes("wrong-password")) {
-                setError('Wrong password.')
-                throw new Error('Wrong password.')
+                setError('Wrong password. Please try again.')
+                throw new Error('Wrong password. Please try again.')
+            } else if (error.code.includes("user-not-found")) {
+                setError('Not registered. Please sign up and try again.')
+                throw new Error('Not registered. Please sign up and try again.')
             }
             setError(error.code)
             setLoading(false)
             throw new Error(error.code)
         }
-
         setLoading(false);
     }
 
@@ -254,11 +267,10 @@ export const AuthProvider = ({children}) => {
         forgotPassword,
         setLoading,
         currentUserDetails,
-        updateCurrentUserDetails,
+        updateUserDetails,
         setCurrentUserDetails,
-        getCurrentUserDetails,
-        userLocation
-    }), [currentUserDetails,initialLoading,loading,error, userLocation])
+        getUserDetails,
+    }), [currentUserDetails,initialLoading,loading,error])
 
 
     return (

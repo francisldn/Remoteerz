@@ -1,8 +1,9 @@
+// @ts-nocheck
 import { View, Text, FlatList, StyleSheet } from 'react-native'
 import React from 'react';
 import HangoutCardItem from './HangoutCardItem';
 import { placeholderImageURL } from '../screens/Profile';
-
+import { chatService } from '../utils/chatService';
 
 const mockData = [
     {
@@ -84,6 +85,8 @@ const mockData = [
 ]
 
 export default function HangoutCardList() {
+    const {chatUsers, loadingChatUsers} = chatService();
+
   return (
     <View className="flex-1 bg-slate-800 w-screen flex-wrap" style={styles.contentWrapper}>
       <FlatList  

@@ -21,9 +21,9 @@ export const LocationContext = createContext({
 export async function getCurrentLocation() {
     let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
+        console.log('status denied')
         return;
       }
-      
     try {
       let loc = await Location.getCurrentPositionAsync()
       const {city, country, district, isoCountryCode, name, postalCode, street, region, subregion, timezone} = (await Location.reverseGeocodeAsync({accuracy:1,latitude:loc.coords.latitude, longitude:loc.coords.longitude}))[0]
@@ -43,22 +43,15 @@ export async function getCurrentLocation() {
         timestamp: loc.timestamp
       }
     } catch (error) {
-      console.log(error)
-      return
+      console.log('failed to get user location')
+      throw new Error(error)
     }
   }
 
 export const LocationProvider = ({children}) => {
-  const [location, setLocation] = useState('')
+  const [currentUserLocation, setCurrentUserLocation] = useState('')
   const [locationLoading, setLocationLoading] = useState(true)
 
-  useEffect(() => {
-    setLocationLoading(true)
-    getCurrentLocation().then(data => {
-      setLocation(data)
-    })
-    setLocationLoading(false)
-  },[]);
   
   async function convertAddressToLatLong(address) {
     try{
@@ -70,14 +63,15 @@ export const LocationProvider = ({children}) => {
       return
     }
   }
-
   
   const memoedValue = useMemo(() => ({
+    setCurrentUserLocation,
     getCurrentLocation,
-    location,
+    currentUserLocation,
     locationLoading,
-    convertAddressToLatLong
-  }),[location, locationLoading])
+    convertAddressToLatLong,
+    setLocationLoading
+  }),[currentUserLocation, locationLoading])
 
   return (
     <LocationContext.Provider value={memoedValue}>

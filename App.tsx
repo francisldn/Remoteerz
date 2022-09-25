@@ -19,14 +19,16 @@ import UserChat from './src/screens/UserChat';
 import { AuthProvider } from './src/utils/useAuth';
 import { LocationProvider } from './src/utils/useLocation';
 import AccountSettings from './src/screens/AccountSettings';
+import { ChatProvider } from './src/utils/chatService';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
     <>
-    <AuthProvider>
-      <LocationProvider>
+    <LocationProvider>
+     <AuthProvider>
+      <ChatProvider>
       <NavigationContainer>
         <Stack.Navigator>
             <Stack.Screen
@@ -116,8 +118,9 @@ export default function App() {
           />
         </Stack.Navigator>
       </NavigationContainer>
-      </LocationProvider>
+      </ChatProvider>
       </AuthProvider>
+      </LocationProvider>
     </>
   );
 }

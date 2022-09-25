@@ -26,7 +26,7 @@ import { placeholderImageURL } from './Profile';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function EditProfile() {
-  const {currentUserDetails, loading, setCurrentUserDetails, updateCurrentUserDetails, getCurrentUserDetails} = useAuth()
+  const {currentUserDetails, loading, setCurrentUserDetails, updateUserDetails, getUserDetails} = useAuth()
   const navigation = useNavigation()
   const [displayValue, setDisplayValue] = useState(CapFirstCharacter(currentUserDetails?.display_status) || 'Public' );
   const [genderValue, setGenderValue] = useState(CapFirstCharacter(currentUserDetails?.gender)|| 'Male');
@@ -68,7 +68,7 @@ export default function EditProfile() {
                 // this does not work --> to check
                 const url = await uploadImageToFirestore(result.uri)
                 const imageData = {image: url}
-                await updateCurrentUserDetails(imageData, currentUserDetails.uid)
+                await updateUserDetails(imageData, currentUserDetails.uid)
                     .then(() => console.log('image successfully updated'))
                     .catch((error) => console.log(error))
                 setIsOpen(false)
@@ -103,7 +103,7 @@ export default function EditProfile() {
                 setImage(result.uri);
                 await uploadImageToFirestore(result.uri, currentUserDetails?.uid)
                 
-                getCurrentUserDetails(currentUserDetails?.uid)
+                getUserDetails(currentUserDetails?.uid)
                     .then(newData => {
                         if(newData) setCurrentUserDetails(newData)
                         console.log('user state updated')
@@ -205,12 +205,13 @@ export default function EditProfile() {
     onSubmit: async (values) => {
         try {
             setCurrentUserDetails(values);
-            await updateCurrentUserDetails(values, currentUserDetails.uid);
-            const data = await getCurrentUserDetails(currentUserDetails?.uid);
+            await updateUserDetails(values, currentUserDetails.uid);
+            const data = await getUserDetails(currentUserDetails?.uid);
             setCurrentUserDetails(data)
             console.log('data upload successful')
+            Alert.alert('Profile changes saved.')
         } catch(error) {
-            Alert.alert("Changes are not saved. Please try again.")
+            Alert.alert("Profile changes not saved. Please try again.")
         }
     }
   })
