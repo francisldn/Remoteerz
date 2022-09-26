@@ -206,11 +206,12 @@ export default function EditProfile() {
         try {
             setCurrentUserDetails(values);
             await updateUserDetails(values, currentUserDetails?.uid);
-            const data = await getUserDetails(currentUserDetails?.uid);
-            setCurrentUserDetails(data)
+            // const data = await getUserDetails(currentUserDetails?.uid);
+            // 
             console.log('data upload successful')
             Alert.alert('Profile changes saved.')
         } catch(error) {
+            setCurrentUserDetails(data)
             Alert.alert("Profile changes not saved. Please try again.")
         }
     }
@@ -224,6 +225,7 @@ export default function EditProfile() {
      <KeyboardAwareScrollView
         extraScrollHeight={20}
         keyboardOpeningTime={200}
+        keyboardShouldPersistTaps="handled"
         >
         <View style={{flex:1, justifyContent:'flex-end', height:"100%"}}>
             <TouchableRipple 

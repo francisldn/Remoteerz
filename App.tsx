@@ -82,9 +82,7 @@ export default function App() {
           <Stack.Screen
             name="UserChat"
             component={UserChat}
-            options= {() => ({
-              title:"",
-            })}
+            options= {({route}) => ({title: route.params?.chatUserName})}
           />
           <Stack.Screen
             name="Chatroom"

@@ -7,23 +7,28 @@ import {dateTimeFormat} from '../utils/time';
 import GlobalStyles from '../utils/GlobalStyles';
 import ChatBubbleSVGLeft from './ChatBubbleSVGLeft';
 import ChatBubbleSVGRight from './ChatBubbleSVGRight';
+import { useAuth } from '../utils/useAuth';
 
-const ChatBubble = ({chatMsg, userA, user, dateTime}) => {
+const ChatBubble = ({singleMsg}) => {
+   const {uid, dateTime, message, chatroomId, user} = singleMsg;
+   const {currentUserDetails} = useAuth();
 
-    const leftOrRight = (userA, user) => {
-        // left is true, right is false
-        return userA === user ? true : false
+    const leftOrRight = (currentUserDetails, user) => {
+        // left is true (chat user), right is false (current user)
+        return user.uid === currentUserDetails.uid ? false : true
     }
 
+    const bubbleDirection = leftOrRight(currentUserDetails, user)
+
     return (
-    <View style={leftOrRight(userA, user) ? [styles.item,styles.itemLeft] : [styles.item,styles.itemRight]}>
-        <View style={[styles.balloon, {backgroundColor: leftOrRight(userA, user) ? 'grey' : '#36a411'}]}>
-          <Text style={[GlobalStyles.CustomFont,styles.chatContent]}>{chatMsg}</Text>
+    <View style={bubbleDirection ? [styles.itemLeft] : [styles.itemRight]}>
+        <View style={[styles.balloon, {backgroundColor: bubbleDirection ? 'grey' : '#36a411'}]}>
+          <Text style={[GlobalStyles.CustomFont,styles.chatContent]}>{message}</Text>
           <Text style={[GlobalStyles.CustomFont,styles.chatDate]}>{dateTimeFormat(dateTime)}</Text>
           <View
-            style={leftOrRight(userA, user) ? [styles.arrowLeftContainer]:[styles.arrowRightContainer]}
+            style={bubbleDirection? [styles.arrowLeftContainer]:[styles.arrowRightContainer]}
           >
-           {leftOrRight(userA, user) 
+           {bubbleDirection 
            ? (<ChatBubbleSVGLeft/>)
             : (<ChatBubbleSVGRight/>)}
         </View>

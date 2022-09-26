@@ -1,10 +1,10 @@
 // @ts-nocheck
 import React,{ createContext, useContext, useEffect, useMemo, useState } from 'react'
 import {db} from './firebase/firebaseConfig';
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs, doc, deleteDoc, setDoc, updateDoc } from "firebase/firestore";
 import { updateUserDetails, getUserDetails, useAuth } from './useAuth';
 import { getDistance, sortUsersByDistance } from './helperFunctions';
-interface SingleChat {
+export interface SingleChat {
     uid:string,
     dateTime: number,
     chatroomId: string,
@@ -16,25 +16,25 @@ interface SingleChat {
     }
 }
 
-interface Chatroom {
+export interface Chatroom {
     chats: SingleChat[],
     lastChat: singleChat,
     users: ChatUser[],
     uid: string
 }
-interface ChatUser {
+export interface ChatUser {
     image: string,
     uid: string,
     username: string
 }
 
-interface ChatProps {
+export interface ChatProps {
     chatrooms:Chatroom[],
     setChatrooms: () => {},
     loadingChats: boolean
 }
 
-interface UserChatroom {
+export interface UserChatroom {
     chatroomId: string,
     userId: string
 }
@@ -50,6 +50,7 @@ export const getChatUsersDetails = async (currentUserCity:string, currentUserLat
         throw new Error('Location service disabled. Please enable location service to find other users.')
     }
     const q = query(collection(db, 'Users'), where("city","==", "Barcelona"));
+
     const usersArray=[]
     try {
         const querySnapshot = await getDocs(q)
@@ -72,6 +73,7 @@ export const getChatUsersDetails = async (currentUserCity:string, currentUserLat
                 longitude:Number(doc.data().longitude),
                 city:doc.data().city,
                 about: doc.data().about,
+                chatrooms: doc.data().chatrooms,
                 distance: getDistance(Number(doc.data().latitude), Number(doc.data().longitude), currentUserLatitude, currentUserLongitude,'K', doc.data().uid, currentUserId) 
             })
         })
@@ -117,50 +119,50 @@ export const getCurrentUserChatDetails= async (currentUserDetails) => {
         console.log(error)
         throw new Error(error)
     }
+    
     return chatroomArray;
 }
 
-export const chatroomExist = (chatUserDetails, currentUserDetails) =>{
-    const chatroomId = [chatUserDetails.uid + currentUserDetails.uid, currentUserDetails.uid + chatUserDetails.uid]
-    chatroomId.forEach(id => {
-        if (currentUserDetails.chatrooms.includes(id)) 
-        return id;
-    })
+export const getUserChatroomIdList = async (userId) => {
+    let chatroomIdList = []
+    try{
+        const userDetails = await getUserDetails(userId);
+        userDetails.chatrooms.forEach(room => chatroomIdList.push(room.chatroomId))
+        return chatroomIdList;
+    }catch(error) {
+        console.log(error)
+        throw new Error(error)
+    }
+}
+
+export const chatroomExist = (chatUserId, currentUserId, chatroomIdList) => {
+    const chatroomId = [chatUserId + currentUserId, currentUserId + chatUserId]
+    for(let i=0; i<chatroomId.length; i++) {
+        console.log(chatroomIdList)
+        if(chatroomIdList.find(id => id === chatroomId[i])) return chatroomId[i]
+    }
     return false;
 }
 
-export const createChatroom = async (chatUserDetails, currentUserDetails) => {
+export const createChatroom = async (chatUserDetails, currentUserDetails, newChatroom) => {
     // check if chatroom exists
-    const isChatroom = chatroomExist(chatUserDetails, currentUserDetails)
+    
     let chatroomId:string;
 
-    if (isChatroom) {
-        console.log('chatroom exists')
-        chatroomId = isChatroom;
-        // return this to set state
-        return {
-            chatroomId,
-            currentUserDetails
-        }
-    }
     // if chatroom does not exist
     // create chatroom in Chatrooms doc
-    chatroomId = chatUserDetails.uid + currentUserDetails.uid
-    const newChatUserDetails = chatUserDetails.chatrooms.push({
+    chatroomId =  newChatroom.uid
+    const newChatUserChatrooms = [...chatUserDetails.chatrooms, {
         chatroomId: chatroomId,
-        userId: currentUser.uid
-    })
-    const newCurrentUserDetails = currentUserDetails.chatrooms.push({
+        userId: currentUserDetails.uid
+    }]
+    const newCurrentUserChatrooms = [...currentUserDetails.chatrooms, {
         chatroomId: chatroomId,
         userId: chatUserDetails.uid
-    })
+    }]
+
     try {
-        await setDoc(doc(db, 'Chatrooms', chatroomId,{
-            uid: chatroomId,
-            chats:[],
-            lastChat:'',
-            users:[]
-        }));
+        await setDoc(doc(db, 'Chatrooms', chatroomId),newChatroom);
         console.log('chatroom created in chatrooms doc')
     } catch(error) {
         console.log(error)
@@ -168,8 +170,8 @@ export const createChatroom = async (chatUserDetails, currentUserDetails) => {
     }
     // update currentUser and chatUser chatrooms
     try{
-       await updateUserDetails(newChatUserDetails,chatUserDetails.uid);
-       await updateUserDetails(newCurrentUserDetails,currentUserDetails.uid);
+       await updateUserDetails({chatrooms: newChatUserChatrooms},chatUserDetails.uid);
+       await updateUserDetails({chatrooms: newCurrentUserChatrooms},currentUserDetails.uid);
        console.log('new chatroom added to users doc')
     } catch(error) {
         console.log(error)
@@ -178,9 +180,11 @@ export const createChatroom = async (chatUserDetails, currentUserDetails) => {
     // fetch new users data
     try {
         const updatedCurrentUserDetails = await getUserDetails(currentUserDetails.uid)
+        const updatedUserChatDetails = await getCurrentUserChatDetails(currentUserDetails)
         return {
             chatroomId,
-            updatedCurrentUserDetails
+            updatedCurrentUserDetails,
+            updatedUserChatDetails
         }
     } catch(error) {
         console.log(error)
@@ -189,11 +193,12 @@ export const createChatroom = async (chatUserDetails, currentUserDetails) => {
 }
 
 export const createSingleChat = (chatText, chatroomId, chatUserDetails, currentUserDetails) => {
+    if(!chatText || !chatroomId || !chatUserDetails || !currentUserDetails) throw new Error()
     return {
-        uid: chatUserDetails.uid + currentUserDetails.uid+dateTime.toString(),
         dateTime: Date.now(),
+        uid: chatUserDetails.uid + currentUserDetails.uid+ Date.now().toString(),
         chatroomId: chatroomId,
-        message:chatText,
+        message:chatText || '',
         status: false, // read = true or unread = false
         user: {
             uid: chatUserDetails.uid,
@@ -204,44 +209,60 @@ export const createSingleChat = (chatText, chatroomId, chatUserDetails, currentU
 
 export const updateSingleChatroom = async (singleChat: SingleChat, currentUserChatDetails: Chatroom[]) => {
     // assume chatroom already exists
-    const chatRef = doc(db,"Chatrooms",singleChat.chatroomId);
-    const newCurrentUserChatDetails = [];
+    let newCurrentUserChatDetails = [];
     try {
-        // update Chatrooms
-        const chatData:Chatroom = await getChatsByChatroomId(singleChat.chatroomId);
-        chatData.push(singleChat)
+        const q = query(collection(db, 'Chatrooms'), where("uid","==", singleChat.chatroomId));
+        // returns a chatroom object
+        const querySnapshot = await getDocs(q)
+        let chatroomID:string
+        querySnapshot.forEach((doc) => {
+            chatroomID = doc.id
+        })
+        const chatRef = doc(db, 'Chatrooms', chatroomID)
+
+        let chatData:Chatroom = await getChatsByChatroomId(singleChat.chatroomId);
+        chatData.chats.push(singleChat)
         const newChatData:Chatroom = {
             ...chatData, 
             lastChat: singleChat
         }
-        newCurrentUserChatDetails = currentUserChatDetails.filter(chatroom => chatroom.uid !== singleChat.chatroomId).push(newChatData)
         await setDoc(chatRef, newChatData, {merge:true})
         console.log('chatroom data updated successfully')
+
+        newCurrentUserChatDetails = currentUserChatDetails.filter(chatroom => chatroom.uid !== singleChat.chatroomId).push(newChatData)
+       
+        // return this to set state
+        return newCurrentUserChatDetails
     } catch (error) {
         console.log(error)
         throw new Error(error)
     }
-    // return new user chat details to set-state
-    return newCurrentUserChatDetails
+
 }
 
 export const deleteChatroom = async (chatroomId:string, chatUserDetails:string, currentUserDetails:string) => {
-    const chatRef = doc(db,"Chatrooms", chatroomId);
+    const q = query(collection(db, 'Chatrooms'), where("uid","==", chatroomId));
+    const querySnapshot = await getDocs(q)
+    let chatroomUID:string;
     // update chatrooms
     try{
+        querySnapshot.forEach(async(doc) => {
+            chatroomUID = doc.id
+        })
+        let chatRef = doc(db,"Chatrooms",chatroomUID);
         await deleteDoc(chatRef)
-        console.log('chatroom deleted successfully')
+        console.log('chatroom deleted from db successfully')
     } catch(error) {
         console.log(error);
         throw new Error(error)
     }
     // update user chats
     try{
-        const newChatUserDetails = chatUserDetails.chats.filter(id => id !== chatroomId);
-        const newCurrentUserDetails = currentUserDetails.chats.filter(id => id !== chatroomId);
-        await updateUserDetails(newChatUserDetails,chatUserDetails.uid);
-        await updateUserDetails(newCurrentUserDetails, currentUserDetails.uid)
-        console.log('chatroom deleted from both users chatrooms')
+        const newUserChatrooms = chatUserDetails.chatrooms.filter(chat => chat.chatroomId !== chatroomId)
+        const newCurrentUserChatrooms = currentUserDetails.chatrooms.filter(chat => chat.chatroomId !== chatroomId)
+        await updateUserDetails({chatrooms: newUserChatrooms },chatUserDetails.uid);
+        await updateUserDetails({chatrooms: newCurrentUserChatrooms}, currentUserDetails.uid)
+        console.log('chatroom deleted from both users chatrooms db')
     } catch(error) {
         console.log(error);
         throw new Error(error)
@@ -287,6 +308,7 @@ export const ChatProvider = ({children}) => {
     const [userChatDetails, setUserChatDetails] = useState(null)
     const [chatUsers, setChatUsers] = useState(null) 
     const {currentUserDetails, loading} = useAuth();
+    const [chatroomIdList, setChatroomIdList] = useState(null)
     const maleImagePlaceholder = "https://xsgames.co/randomusers/avatar.php?g=male"
     const femaleImagePlaceholder = "https://xsgames.co/randomusers/avatar.php?g=female"
     const placeholderImages = [maleImagePlaceholder, femaleImagePlaceholder]
@@ -320,9 +342,20 @@ export const ChatProvider = ({children}) => {
             setLoadingChat(false)
             throw new Error(error)
         }
+        // get list of chatrooms
+        try{
+            if(currentUserDetails) {
+                getUserChatroomIdList(currentUserDetails.uid)
+                    .then(data => setChatroomIdList(data))
+                    .catch(error => {throw new Error(error)})
+                console.log('user chat room id list loaded')
+            }
+        } catch (error) {
+            console.log('Chatroom list not loaded');
+            throw new Error(error)
+        }
 
-        
-        
+
         setLoadingChatUsers(false)
         setLoadingChat(false)
     }, [currentUserDetails])
@@ -336,8 +369,10 @@ export const ChatProvider = ({children}) => {
         setUserChatDetails,
         chatUsers,
         setChatUsers,
-        placeholderImages
-    }), [loadingChat, loadingChatUsers, userChatDetails, chatUsers])
+        placeholderImages,
+        chatroomIdList,
+        setChatroomIdList
+    }), [loadingChat, loadingChatUsers, userChatDetails, chatUsers, chatroomIdList])
 
     return (
         <ChatContext.Provider value={memoedValue}>

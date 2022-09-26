@@ -23,11 +23,11 @@ import {useLocation} from './useLocation'
 //     loading: boolean
 // }
 
-
+// userdata in Object
 export const updateUserDetails = async (userData, userId) => {
     if(userId) {
-        const docRef = doc(db,"Users",userId)
         try {
+            const docRef = doc(db,"Users",userId)
             await setDoc(docRef, userData, {merge:true})
         } catch (error) {
             console.log(error)

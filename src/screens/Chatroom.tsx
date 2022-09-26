@@ -11,9 +11,10 @@ export default function Chatroom() {
   return (
     <>
       <FlatList 
-                data={userChatDetails} 
-                ListEmptyComponent={() => (<View style={{flex: 1, justifyContent: 'center', alignItems: 'center', height: '100%',paddingTop:'20%'}}><Text>NO ITEMS TO DISPLAY</Text></View>)}
-                renderItem={({item, index}) => <MessageBox key={index} chatroom={item}/>}
+          style={{flex:1}}
+          data={userChatDetails} 
+          ListEmptyComponent={() => (<View style={{flex: 1, justifyContent: 'center', alignItems: 'center', height: '100%',paddingTop:'20%'}}><Text>NO MESSAGES TO DISPLAY</Text></View>)}
+          renderItem={({item, index}) => <MessageBox key={index} chatroom={item}/>}
       />
     <Footer screen="Chatroom"/>
 </>

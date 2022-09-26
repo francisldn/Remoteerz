@@ -11,10 +11,31 @@ import { updateUserDetails, getUserDetails } from '../utils/useAuth';
 import { useNavigation } from "@react-navigation/native";
 import { displayDistance } from "../utils/helperFunctions";
 import LoadingSpinner from "./LoadingSpinner";
+import { createChatroom, chatService, chatroomExist, getCurrentUserChatDetails, getUserChatroomIdList } from "../utils/chatService";
 
 export default function BottomSheetProfileView({userDetails, preview}) {
     const {currentUserDetails, setCurrentUserDetails} = useAuth();
-    const navigation = useNavigation();
+    const {setUserChatDetails, chatroomIdList, setChatroomIdList} = chatService();
+    const {navigate} = useNavigation();
+    
+    // props to pass to UserChat screen
+    let chatroom = {
+        chats: [],
+        lastChat: '',
+        users: [
+        {
+            image: currentUserDetails?.image || '',
+            uid: currentUserDetails?.uid,
+            username: currentUserDetails?.username,
+        },
+        {
+            image: userDetails?.image || '',
+            uid: userDetails?.uid,
+            username: userDetails?.username 
+        }
+        ],
+        uid: currentUserDetails?.uid + userDetails?.uid
+    }
     if(!userDetails || !currentUserDetails) return (<LoadingSpinner size={"large"}/>)
 
     const snapPoints = useMemo(() => ["20%", "50%", "90%"], []);
@@ -46,9 +67,40 @@ export default function BottomSheetProfileView({userDetails, preview}) {
             console.log(error)
         }
     }
-    
 
+    const handleChat = async () => {
+        if(!userDetails || !currentUserDetails || !chatroomIdList) throw new Error()
+        try{
+            // check to prevent 2 chatrooms with the same user created
+            if(chatroomExist(userDetails.uid, currentUserDetails.uid, chatroomIdList)) {
+                chatroom.uid = chatroomExist(userDetails.uid, currentUserDetails.uid, chatroomIdList)
+                navigate('UserChat',{
+                    chatroom: chatroom, 
+                    chatUserName: userDetails?.username,
+                    chatUserId: userDetails?.uid
+                })
+                const chatroomDetails = await getCurrentUserChatDetails(currentUserDetails);
+                setUserChatDetails(chatroomDetails);
+                return
+            }
+            // if chatroom not available, then create new chatroom
+            const newChatroomIdList = [...chatroomIdList, userDetails.uid + currentUserDetails.uid, currentUserDetails.uid + userDetails.uid]
+            setChatroomIdList(newChatroomIdList)
+            navigate('UserChat',{
+                chatroom: chatroom, 
+                chatUserName: userDetails?.username,
+                chatUserId: userDetails?.uid
+            })
 
+            const {updatedCurrentUserDetails, chatroomId, updatedUserChatDetails} = await createChatroom(userDetails, currentUserDetails, chatroom)
+            setCurrentUserDetails(updatedCurrentUserDetails);
+            setUserChatDetails(updatedUserChatDetails)
+            console.log('new chatroom created')
+        } catch (error){
+            console.log(error)
+        }
+       
+    }
     
 
     return (
@@ -75,7 +127,7 @@ export default function BottomSheetProfileView({userDetails, preview}) {
                                 : (<Ionicons name="person-add" size={32} color="#b4bcff" style={{paddingRight:'9%'}}/>)
                             }
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={()=> navigation.navigate('UserChat', userDetails)}>
+                        <TouchableOpacity onPress={() => handleChat()}>
                             <Ionicons name="md-chatbox-outline" size={32} color="#b4bcff" style={{paddingRight:'4%'}}/>
                         </TouchableOpacity>
                     </View>)}

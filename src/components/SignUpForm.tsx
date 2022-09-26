@@ -27,7 +27,8 @@ export default function SignUpForm() {
   return (
     <KeyboardAwareScrollView
       extraScrollHeight={20}
-      keyboardOpeningTime={200}
+      keyboardOpeningTime={20}
+      keyboardShouldPersistTaps="handled"
     >
       <View className="flex justify-center align-middle mx-[8%] pt-[40%]">
         <View>

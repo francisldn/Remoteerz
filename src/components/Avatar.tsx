@@ -10,7 +10,7 @@ interface AvatarProps {
 
 export default function Avatar({imageURL, size, update}:AvatarProps) {
   return (
-    <View className="rounded-full border-[4rem] border-[#4539d2]">
+    <View className="rounded-full border-[4rem] border-[#4539d2]" style={{shadowColor:"#01003b", shadowOpacity:0.8, shadowRadius:15,shadowOffset:{height:0, width:0}, elevation:20 }}>
         <View className="rounded-full overflow-hidden border-2 border-white" style={{width: size, height: size}}>
             <ImageBackground source={{uri: imageURL}} style={styles.featuredPhoto} resizeMode="cover">
                 {update && (

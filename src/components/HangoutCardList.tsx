@@ -86,7 +86,7 @@ import LoadingSpinner from './LoadingSpinner';
 // ]
 
 export default function HangoutCardList() {
-  const {chatUsers, loadingChatUsers} = chatService();
+  const {chatUsers} = chatService();
   const {currentUserDetails} = useAuth()
 
   if( !chatUsers || !currentUserDetails) return (
