@@ -1,5 +1,5 @@
 // @ts-nocheck
-import {View, StyleSheet, Text, FlatList, Dimensions} from 'react-native';
+import {View, StyleSheet, Text, FlatList, Dimensions, ScrollView} from 'react-native';
 import React,{useState, useEffect} from 'react'
 import { useAuth } from '../utils/useAuth';
 import Footer from '../components/Footer';
@@ -8,13 +8,15 @@ import ChatBubble from '../components/ChatBubble';
 import { sortMessageByDate } from '../utils/time';
 import GlobalStyles from '../utils/GlobalStyles';
 import ChatInputBar from '../components/ChatInputBar';
+import { KeyboardAvoidingView } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 export default function UserChat({route}) {
     const {chatroom, chatUserName, chatUserId} = route.params
     const {chats} = chatroom;
 
   return (
-    <>
+      <>
       <FlatList  
             contentContainerStyle={styles.chatContainer}
             data={chats ? chats : []} // need to change
@@ -29,22 +31,16 @@ export default function UserChat({route}) {
             )}
             renderItem={({item, index}) => <ChatBubble key={index} singleMsg={item}/>}
         />
-
-        <ChatInputBar chatroom={chatroom} chatUserName={chatUserName} chatUserId={chatUserId}/>
-      
-    </>
+          <ChatInputBar chatroom={chatroom} chatUserName={chatUserName} chatUserId={chatUserId}/>
+      </>
   )
 }
 
 const styles = StyleSheet.create({
     chatContainer: {
         display: 'flex',
-        flex: 1,
         width: '100%',
-        borderWidth:2,
-        borderColor:'red',
-
-
+        height: '100%'
     },
     emptyContainer: {
         display:'flex',  

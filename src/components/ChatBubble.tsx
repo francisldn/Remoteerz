@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React from 'react';
-import {View, StyleSheet, Text} from 'react-native';
+import {View, StyleSheet, Text, Dimensions} from 'react-native';
 import {Svg, Path} from 'react-native-svg'
 import {moderateScale} from 'react-native-size-matters';
 import {dateTimeFormat} from '../utils/time';
@@ -14,14 +14,14 @@ const ChatBubble = ({singleMsg}) => {
    const {currentUserDetails} = useAuth();
 
     const leftOrRight = (currentUserDetails, user) => {
-        // left is true (chat user), right is false (current user)
-        return user.uid === currentUserDetails.uid ? false : true
+        // left is false (chat user), right is true (current user)
+        return user.uid === currentUserDetails.uid ? true : false
     }
 
     const bubbleDirection = leftOrRight(currentUserDetails, user)
 
     return (
-    <View style={bubbleDirection ? [styles.itemLeft] : [styles.itemRight]}>
+    <View style={bubbleDirection ? [styles.item,styles.itemLeft] : [styles.item,styles.itemRight]}>
         <View style={[styles.balloon, {backgroundColor: bubbleDirection ? 'grey' : '#36a411'}]}>
           <Text style={[GlobalStyles.CustomFont,styles.chatContent]}>{message}</Text>
           <Text style={[GlobalStyles.CustomFont,styles.chatDate]}>{dateTimeFormat(dateTime)}</Text>

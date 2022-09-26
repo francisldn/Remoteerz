@@ -31,8 +31,8 @@ export default function ChatInputBar({chatroom, chatUserName, chatUserId}) {
       //https://github.com/APSL/react-native-keyboard-aware-scroll-view/issues/222
       keyboardShouldPersistTaps="handled"
       keyboardOpeningTime={20}
-      extraScrollHeight={60}
-      contentContainerStyle={{alignItems:'flex-end', alignSelf:'flex-end', paddingTop:screenHeight-200}}
+      extraScrollHeight={55}
+      contentContainerStyle={{height:'10%'}}
       enableResetScrollToCoords={true}
       >
        <Formik
@@ -103,7 +103,7 @@ export default function ChatInputBar({chatroom, chatUserName, chatUserId}) {
 
 const styles = StyleSheet.create({
     textInput: {
-      flex: 1,
+      flex:1,
       width:'80%',
       paddingLeft: "3%",
       color: '#05375a',
@@ -111,7 +111,9 @@ const styles = StyleSheet.create({
       borderColor:"#05375a",
       borderRadius: 20,
       fontSize: 18,
-      height: 50
+      height: 50,
+      borderColor:'blue',
+      borderWidth:2,
 
     },
     panelButton: {
