@@ -5,7 +5,7 @@ import GlobalStyles from '../utils/GlobalStyles'
 interface AvatarProps {
     imageURL: string;
     size: number;
-    update:boolean;
+    update: boolean;
 }
 
 export default function Avatar({imageURL, size, update}:AvatarProps) {

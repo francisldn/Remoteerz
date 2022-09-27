@@ -90,13 +90,13 @@ export default function HangoutCardList() {
   const {currentUserDetails} = useAuth()
 
   if( !chatUsers || !currentUserDetails) return (
-    <>
-        <ScrollView style={{flex:1}} contentContainerStyle={{display:'flex',paddingTop:'50%'}}>
-            <View>
-                <LoadingSpinner size={"large"}/>
-            </View>
-        </ScrollView>
-    </>
+    
+    <ScrollView style={{flex:1}} contentContainerStyle={{display:'flex',paddingTop:'50%'}}>
+        <View>
+            <LoadingSpinner size={"large"}/>
+        </View>
+    </ScrollView>
+    
   )
     
 

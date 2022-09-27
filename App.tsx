@@ -1,5 +1,5 @@
 // @type-nocheck
-import { StyleSheet, Text, Pressable } from 'react-native';
+import { LogBox, Text, Pressable } from 'react-native';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -24,6 +24,10 @@ import { ChatProvider } from './src/utils/chatService';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  // suppress warning for now - to check these later
+  LogBox.ignoreLogs(['Warning: ...']);
+  LogBox.ignoreLogs(['EventEmitter...']);
+
   return (
     <>
     <LocationProvider>

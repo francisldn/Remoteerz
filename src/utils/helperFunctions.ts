@@ -113,6 +113,17 @@ export const sortUsersByDistance = (chatUsersData) => {
     return chatUsersData.slice().sort((a, b) => a.distance - b.distance)
 }
 
+export const exCurrentUserFromList = (chatUsersDetails:[], userId:string) => {
+    return chatUsersDetails.filter(user => user.uid !== userId)
+}
+
+export const myFriendsList = (chatUsersDetails:[], currentUserDetails) => {
+    const myFriendsUserDetails = chatUsersDetails.map(user => {
+        if(currentUserDetails.myFriends.includes(user.uid)) return user
+    })
+    return myFriendsUserDetails
+}
+
 export const displayDistance = (distance) => {
     distance= Number(distance)
     return distance < 1 ? Math.floor(distance*1000).toString() + 'm away' : distance.toFixed(1) + ' km away'

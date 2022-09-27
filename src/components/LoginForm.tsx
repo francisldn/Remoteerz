@@ -23,7 +23,7 @@ export default function LoginForm() {
   return (
     <KeyboardAwareScrollView
       extraScrollHeight={20}
-      keyboardOpeningTime={20}
+      keyboardOpeningTime={0}
       keyboardShouldPersistTaps="handled"
     >
     <View

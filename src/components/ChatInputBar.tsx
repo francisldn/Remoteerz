@@ -1,6 +1,6 @@
 // @ts-nocheck
-import { View, Text, TouchableWithoutFeedback, Keyboard, StyleSheet, TextInput, Pressable, KeyboardAvoidingView, Dimensions } from 'react-native'
-import React from 'react'
+import { View, Text, TouchableWithoutFeedback, ScrollView, StyleSheet, TextInput, Pressable, Dimensions } from 'react-native'
+import React,{useState, useEffect} from 'react'
 import { Formik } from 'formik'
 import * as yup from 'yup';
 import { createSingleChat, updateSingleChatroom } from '../utils/chatService';
@@ -8,10 +8,27 @@ import { chatService } from '../utils/chatService';
 import { useAuth } from '../utils/useAuth';
 import GlobalStyles from '../utils/GlobalStyles';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import useKeyboardHeight from 'react-native-use-keyboard-height'
+import { KeyboardAvoidingView } from 'react-native';
 
 export default function ChatInputBar({chatroom, chatUserName, chatUserId}) {
   const {userChatDetails, setUserChatDetails, chatUsers, userChat} = chatService()
   const {currentUserDetails} = useAuth()
+  const [contentBottom, setContentBottom] = useState(0);
+  const [keyboardActive, setKeyboardActive] = useState(false)
+
+  const screenHeight = Dimensions.get('window').height;
+  const keyHeight = useKeyboardHeight();
+
+  useEffect(()=>{  
+    if (keyboardActive){
+      const diff = (parseFloat((screenHeight - keyHeight)/2))
+      setContentBottom(diff)
+    } else{
+      setContentBottom(0)
+    }
+  },[keyHeight, keyboardActive])
+
 
   const chatUserDetails = {
     uid: chatUserId,
@@ -24,22 +41,24 @@ export default function ChatInputBar({chatroom, chatUserName, chatUserId}) {
     .optional()
   })
 
-  const screenHeight = Dimensions.get('window').height;
+  
 
   return (
-    <KeyboardAwareScrollView 
-      //https://github.com/APSL/react-native-keyboard-aware-scroll-view/issues/222
-      keyboardShouldPersistTaps="handled"
-      keyboardOpeningTime={20}
-      extraScrollHeight={55}
-      contentContainerStyle={{height:'10%'}}
-      enableResetScrollToCoords={true}
-      >
+    // <View style={styles.container}>
+    // <KeyboardAwareScrollView 
+    //   style={styles.scrollContainer}
+    //   //https://github.com/APSL/react-native-keyboard-aware-scroll-view/issues/222
+    //   keyboardShouldPersistTaps="handled"
+    //   keyboardOpeningTime={0}
+    //   extraScrollHeight={100}
+    //   contentContainerStyle={{borderWidth:1, borderColor:'red'}}
+    //   // enableResetScrollToCoords
+    //   extraHeight={0}
+    //   >
        <Formik
           initialValues={{message: ''}}
           validationSchema={ChatInputSchema}
           onSubmit={async (values, {resetForm}) => {
-            console.log(values)
               try{
                   const singleChat = createSingleChat(values,chatroom.uid, chatUserDetails, currentUserDetails)
                   // create new user chat details to update state
@@ -58,7 +77,6 @@ export default function ChatInputBar({chatroom, chatUserName, chatUserId}) {
         {({ values,
             setValues,
             handleSubmit,
-            resetForm,
             touched,
             errors
             }) => (
@@ -98,10 +116,21 @@ export default function ChatInputBar({chatroom, chatUserName, chatUserId}) {
           </View>
       </>)}
     </Formik>
-  </KeyboardAwareScrollView>
+  // </KeyboardAwareScrollView>
+  // </View>
 )}
 
 const styles = StyleSheet.create({
+  // container:{
+  //   alignContent:'flex-end',
+  //   justifyContent:'flex-end',
+  // },
+  scrollContainer:{
+    flex:1,
+    backgroundColor: "yellow",
+    alignContent:'flex-end',
+
+  },
     textInput: {
       flex:1,
       width:'80%',
@@ -114,7 +143,6 @@ const styles = StyleSheet.create({
       height: 50,
       borderColor:'blue',
       borderWidth:2,
-
     },
     panelButton: {
       width: '20%',

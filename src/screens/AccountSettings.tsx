@@ -22,7 +22,7 @@ export default function AccountSettings() {
   }
 
   return (
-    <View>
+    <View className="w-[95%] mx-auto pt-[10%]">
       <AuthButton btnText={"Logout"} btnAction={handleLogout} />
     </View>
   )

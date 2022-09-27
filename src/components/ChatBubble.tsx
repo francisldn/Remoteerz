@@ -41,12 +41,12 @@ const ChatBubble = ({singleMsg}) => {
 // chat bubble styling modified from https://stackoverflow.com/questions/50465450/chat-bubble-in-react-native
 const styles = StyleSheet.create({
     itemLeft: {
-        marginVertical: moderateScale(7, 2),
+        paddingVertical: moderateScale(7, 2),
         flexDirection: 'row',
         marginLeft: '4%'
      },
      itemRight: {
-        marginVertical: moderateScale(7, 2),
+        paddingVertical: moderateScale(7, 2),
         flexDirection: 'row',
         alignSelf: 'flex-end',
         marginRight: '4%'
@@ -82,11 +82,11 @@ const styles = StyleSheet.create({
          alignItems: 'flex-end',
      },
      chatContent: {
-        paddingTop: 5, 
+        paddingTop: 3, 
         color: 'white'
      },
      chatDate: {
-        paddingTop: 3, 
+        paddingTop: 1, 
         fontSize:8, 
         color:'white',
         alignSelf:'flex-end'
