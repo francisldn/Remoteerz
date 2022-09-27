@@ -101,15 +101,8 @@ export default function EditProfile() {
 
             if (!result.cancelled) {
                 setImage(result.uri);
-                await uploadImageToFirestore(result.uri, currentUserDetails?.uid)
-                
-                getUserDetails(currentUserDetails?.uid)
-                    .then(newData => {
-                        if(newData) setCurrentUserDetails(newData)
-                        console.log('user state updated')
-                    })
-                    .catch((error) => console.log(error))
-                
+                const downloadURL = await uploadImageToFirestore(result.uri, currentUserDetails?.uid)
+                setCurrentUserDetails(prev => ({...prev, image:downloadURL}))
 
                 setIsOpen(false)
             }

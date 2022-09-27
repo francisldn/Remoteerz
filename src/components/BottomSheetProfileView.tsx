@@ -41,7 +41,7 @@ export default function BottomSheetProfileView({userDetails, preview}) {
     const snapPoints = useMemo(() => ["20%", "50%", "90%"], []);
 
     const isFriend = (id:string) => {
-        if(!currentUserDetails || !userDetails) {
+        if(!currentUserDetails || !userDetails || !currentUserDetails.myFriends) {
             console.log('current user details not loaded.')
             return
         }

@@ -25,10 +25,11 @@ export default function UserChat({route}) {
 
     useEffect(() => {
       // user chat useffects -> check if useffect is called
-      const newMessages = userChatDetails.find(room => room.uid === chatroom.uid).chats
-      setMessages(newMessages)
+      if(userChatDetails) {
+        const newMessages = userChatDetails?.find(room => room.uid === chatroom.uid)
+        if(newMessages) setMessages(newMessages.chats)
+      } 
     },[userChatDetails])
-
 
 
     if(!chats || chats ===[]) {

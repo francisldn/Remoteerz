@@ -25,8 +25,7 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
   // suppress warning for now - to check these later
-  LogBox.ignoreLogs(['Warning: ...']);
-  LogBox.ignoreLogs(['EventEmitter...']);
+  LogBox.ignoreAllLogs();
 
   return (
     <>

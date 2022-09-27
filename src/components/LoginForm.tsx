@@ -27,7 +27,7 @@ export default function LoginForm() {
       keyboardShouldPersistTaps="handled"
     >
     <View
-      className="flex justify-center align-middle mx-[8%] pt-[45%]"
+      className="flex justify-center align-middle mx-[8%]"
       >
       {/* To dismiss keyboard if touch outside the input field */}
         <View>
@@ -93,7 +93,7 @@ export default function LoginForm() {
             </Formik>
             
             <AuthButton 
-              btnText="Sign Up" 
+              btnText="Join Remoteers" 
               btnAction={() => navigation.navigate('SignUp')}
             />
             

@@ -9,8 +9,10 @@ export const CapFirstCharacter = (str:string) => {
 }
 
 export const uploadImageToFirestore = async (imgURL, userId) => {
+    
     const storage = getStorage(); //storage instance
     // convert imgURL to Blob (bytes)
+    let imageURL:string;
     try {
         const response = await fetch(imgURL);
         const bytes = await response.blob();
@@ -20,39 +22,47 @@ export const uploadImageToFirestore = async (imgURL, userId) => {
 
         const uploadTask = uploadBytesResumable(storageRef, bytes)
 
-        uploadTask.on('state_changed', 
-            (snapshot) => {
-                // Observe state change events such as progress, pause, and resume
-                // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                console.log('Upload is ' + progress + '% done');
-                switch (snapshot.state) {
-                case 'paused':
-                    console.log('Upload is paused');
-                    break;
-                case 'running':
-                    console.log('Upload is running');
-                    break;
-                }
-            }, 
-            (error) => {
-                console.log(error)
-                throw new Error(error)
-            }, 
-            () => {
-                // Handle successful uploads on complete
-                // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-                getDownloadURL(uploadTask.snapshot.ref)
-                    .then((downloadURL) => {
-                        updateUserDetails({image: downloadURL}, userId)
-                            .then(() => console.log('image url successfully updated'))
-                            .catch((error) => console.log(error))
-                    })
-                    .catch(error => {
-                        console.log(error)
-                        throw new Error(error)
-                    })
+        const imageURL = await new Promise((resolve, reject) => {
+            uploadTask.on('state_changed', 
+                (snapshot) => {
+                    // Observe state change events such as progress, pause, and resume
+                    // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    console.log('Upload is ' + progress + '% done');
+                    switch (snapshot.state) {
+                    case 'paused':
+                        console.log('Upload is paused');
+                        break;
+                    case 'running':
+                        console.log('Upload is running');
+                        break;
+                    }
+                }, 
+                (error) => {
+                    console.log(error)
+                    reject(error)
+                }, 
+                () => {
+                    // Handle successful uploads on complete
+                    // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+                    getDownloadURL(uploadTask.snapshot.ref)
+                        .then((downloadURL) => {
+                            resolve(downloadURL)
+                        })
+                        .catch(error => {
+                            console.log(error)
+                            reject(error)
+                        })
+                })
         })
+        
+        updateUserDetails({image: imageURL}, userId)
+        .then(() => {
+            console.log('image url successfully updated')
+        })
+        .catch((error) => console.log(error))
+
+        return imageURL;
 
     } catch (error) {
         console.log(error)
@@ -114,14 +124,20 @@ export const sortUsersByDistance = (chatUsersData) => {
 }
 
 export const exCurrentUserFromList = (chatUsersDetails:[], userId:string) => {
+    if(!chatUsersDetails || !userId) return []
     return chatUsersDetails.filter(user => user.uid !== userId)
 }
 
 export const myFriendsList = (chatUsersDetails:[], currentUserDetails) => {
-    const myFriendsUserDetails = chatUsersDetails.map(user => {
-        if(currentUserDetails.myFriends.includes(user.uid)) return user
-    })
-    return myFriendsUserDetails
+    let myFriendsUserDetails = []
+    if(!chatUsersDetails || !currentUserDetails || !currentUserDetails.myFriends) return []
+    for (let i=0; i<chatUsersDetails.length; i++) {
+        let id = chatUsersDetails[i].uid
+        if(currentUserDetails?.myFriends?.includes(chatUsersDetails[i].uid)) {
+            myFriendsUserDetails.push(chatUsersDetails[i])
+        }
+    }
+    return myFriendsUserDetails;
 }
 
 export const displayDistance = (distance) => {

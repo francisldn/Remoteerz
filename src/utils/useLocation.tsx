@@ -56,7 +56,6 @@ export const LocationProvider = ({children}) => {
   async function convertAddressToLatLong(address) {
     try{
       const data = await Location.geocodeAsync(address)
-      console.log(data)
       return data
     } catch (error) {
       console.log(error)

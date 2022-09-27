@@ -18,6 +18,8 @@ const MessageBox = ({chatroom}:Chatroom) => {
     const {chatUsers, setUserChatDetails, userChatDetails} = chatService()
     // function to determine chatUserId
     // arguments - users from chatroom (only 2 users), chatUsers include all users in Hangouts (containing more user details)
+    
+    
     const getChatUser = (users, chatUsers) => {
         if(!currentUserDetails || !chatUsers || !users) {
             console.log('chat user data not loaded')
@@ -25,8 +27,9 @@ const MessageBox = ({chatroom}:Chatroom) => {
         }
         // get chat user id
         const chatUserId = users?.find(user => user?.uid !== currentUserDetails?.uid)
+
         // return chat user details object
-        return chatUsers?.find(user => user.uid === chatUserId.uid)
+        return chatUsers?.find(user => user.uid === chatUserId?.uid)
     }
 
     const chatUserDetails = getChatUser(users, chatUsers);

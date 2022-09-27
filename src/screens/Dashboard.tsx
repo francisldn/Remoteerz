@@ -12,8 +12,7 @@ import GlobalStyles from '../utils/GlobalStyles';
 export default function Dashboard() {
   const {chatUsers} = chatService()
   const {currentUserDetails} = useAuth()
-  const userId = currentUserDetails.uid
-  console.log(chatUsers)
+  const userId = currentUserDetails?.uid
 
 //   if(!chatUsers || !currentUserDetails) return (
 //     <ScrollView style={{flex:1}} contentContainerStyle={{display:'flex',paddingTop:'50%'}}>
@@ -22,12 +21,25 @@ export default function Dashboard() {
 //       </View>
 //     </ScrollView>
 // )
+
+
+  if( !chatUsers || !currentUserDetails) return (
+    
+    <ScrollView style={{flex:1}} contentContainerStyle={{display:'flex',paddingTop:'50%'}}>
+        <View>
+            <LoadingSpinner size={"large"}/>
+        </View>
+    </ScrollView>
+  )
+
+  const allUsers = chatUsers || []
+  const myFriends = myFriendsList(chatUsers, currentUserDetails) || []
   
   return (
   <>
     <ScrollView style={{flex:1}}>
-      <ImageList filterList={exCurrentUserFromList(chatUsers,userId)} sectionLabel={"Hangouts"} iconName={"ios-people-sharp"}/>
-      <ImageList filterList={myFriendsList(chatUsers, currentUserDetails)} sectionLabel={"My Friends"} iconName={"ios-people-sharp"}/>
+      <ImageList filterList={allUsers} sectionLabel={"Hangouts"} iconName={"ios-people-sharp"}/>
+      <ImageList filterList={myFriends} sectionLabel={"My Friends"} iconName={"ios-people-sharp"}/>
       <DashboardLabel sectionLabel={"Events"} iconName={"ios-calendar"}/>
       <View className="pt-[2%] pl-[2%]">
             <Text style={GlobalStyles.CustomFont} className="text-xl">MORE EVENTS COMING SOON...</Text>

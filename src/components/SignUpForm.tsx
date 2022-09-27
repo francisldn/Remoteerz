@@ -30,7 +30,7 @@ export default function SignUpForm() {
       keyboardOpeningTime={20}
       keyboardShouldPersistTaps="handled"
     >
-      <View className="flex justify-center align-middle mx-[8%] pt-[40%]">
+      <View className="flex justify-center align-middle mx-[8%]">
         <View>
         <Formik
             initialValues={{email: '', password:'', confirmPassword: ''}}

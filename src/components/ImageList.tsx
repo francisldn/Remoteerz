@@ -9,7 +9,6 @@ export default function ImageList({filterList, sectionLabel, iconName}) {
         
     
       return (
-    
         <View>
             <DashboardLabel sectionLabel={sectionLabel} iconName={iconName}/>
             <View className="h-50 bg-[#ffffff] w-full py-[3%]" style={styles.contentWrapper}>
