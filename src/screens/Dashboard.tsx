@@ -8,6 +8,7 @@ import { exCurrentUserFromList, myFriendsList } from '../utils/helperFunctions';
 import { useAuth } from '../utils/useAuth';
 import { chatService } from '../utils/chatService';
 import GlobalStyles from '../utils/GlobalStyles';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function Dashboard() {
   const {chatUsers} = chatService()

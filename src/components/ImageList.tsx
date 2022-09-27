@@ -9,9 +9,9 @@ export default function ImageList({filterList, sectionLabel, iconName}) {
         
     
       return (
-        <View>
+        <ScrollView style={{flex:1}}>
             <DashboardLabel sectionLabel={sectionLabel} iconName={iconName}/>
-            <View className="h-50 bg-[#ffffff] w-full py-[3%]" style={styles.contentWrapper}>
+            <ScrollView className="h-50 bg-[#ffffff] w-full py-[3%] flex-1" style={styles.contentWrapper}>
                 <ScrollView  
                     contentContainerStyle={{display:'flex', flexDirection:'row', width:'100%'}}
                     horizontal={true}
@@ -20,8 +20,8 @@ export default function ImageList({filterList, sectionLabel, iconName}) {
                         <ImageItem key={index} userDetails={user}/>
                     ))}
                 </ScrollView>
-            </View>
-        </View> 
+            </ScrollView>
+        </ScrollView> 
       )
 }
 

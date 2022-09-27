@@ -197,7 +197,21 @@ export default function EditProfile() {
     validationSchema: ProfileSchema,
     onSubmit: async (values) => {
         try {
-            setCurrentUserDetails(values);
+            setCurrentUserDetails(prev => ({
+                ...prev,
+                username: values.username,
+                about: values.about,
+                interests: values.interests,
+                display_status: values.display_status,
+                sexual_orientation:values.sexual_orientation,
+                age: values.age,
+                gender: values.gender,
+                job_title: values.job_title,
+                skills: values.skills,
+                countries_travelled: values.countries_travelled,
+                countries_lived: values.countries_lived,
+                favourite_cities: values.favourite_cities
+            }));
             await updateUserDetails(values, currentUserDetails?.uid);
             // const data = await getUserDetails(currentUserDetails?.uid);
             // 

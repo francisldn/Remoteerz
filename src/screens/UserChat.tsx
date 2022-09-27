@@ -53,14 +53,12 @@ export default function UserChat({route}) {
         extraScrollHeight={50}
         viewIsInsideTabBar
         onKeyboardWillShow={() => {
-          console.log('will show')
           chatRef.current.setNativeProps({
             paddingTop:keyboardHeight,
           })
         }}
         enableAutomaticScroll={true}
         onKeyboardWillHide={() => {
-          console.log('will hide')
           chatRef.current.setNativeProps({
             marginTop:0,
             paddingTop:0
