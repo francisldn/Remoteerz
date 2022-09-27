@@ -20,6 +20,7 @@ import { AuthProvider } from './src/utils/useAuth';
 import { LocationProvider } from './src/utils/useLocation';
 import AccountSettings from './src/screens/AccountSettings';
 import { ChatProvider } from './src/utils/chatService';
+import TechStacks from './src/screens/TechStacks';
 
 const Stack = createNativeStackNavigator();
 
@@ -116,6 +117,13 @@ export default function App() {
           <Stack.Screen
             name="AccountSettings"
             component={AccountSettings}
+          />
+          <Stack.Screen
+            name="TechStacks"
+            component={TechStacks}
+            options= {() => ({
+              title:"Tech Stacks (for Demo only)",
+            })}
           />
         </Stack.Navigator>
       </NavigationContainer>

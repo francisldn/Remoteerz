@@ -309,8 +309,8 @@ export const ChatProvider = ({children}) => {
     const [chatUsers, setChatUsers] = useState(null) 
     const {currentUserDetails, loading} = useAuth();
     const [chatroomIdList, setChatroomIdList] = useState(null)
-    const maleImagePlaceholder = "https://firebasestorage.googleapis.com/v0/b/remoteers-360d0.appspot.com/o/placeholder.jpg?alt=media&token=379c6353-a289-4652-bc45-c0dcde2c1bab"
-    const femaleImagePlaceholder = "https://firebasestorage.googleapis.com/v0/b/remoteers-360d0.appspot.com/o/placeholder.jpg?alt=media&token=379c6353-a289-4652-bc45-c0dcde2c1bab"
+    const maleImagePlaceholder = "https://unsplash.com/photos/uuVguyksViA"
+    const femaleImagePlaceholder = "https://unsplash.com/photos/uuVguyksViA"
     const placeholderImages = [maleImagePlaceholder, femaleImagePlaceholder]
 
     useEffect(() => {

@@ -19,13 +19,14 @@ interface SettingListProps {
 const SettingList = ({
       iconName, 
       text, 
+      nav
     }:SettingListProps) => {
     const {colors} = useTheme();
     const navigation= useNavigation()
     return (
         <TouchableRipple 
             className="flex flex-row" 
-            onPress={() =>navigation.navigate('AccountSettings')}
+            onPress={() =>navigation.navigate(nav)}
             rippleColor="rgba(0, 0, 0, .32)"
             borderless={true}
             style={styles.listContainer}

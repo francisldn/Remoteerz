@@ -9,7 +9,7 @@ export default function ImageItem({userDetails}) {
     const imageURL = userDetails?.image || placeholderImages[Math.round(Math.random())]
   
     return (
-      <ImageBackground source={{uri:imageURL}} className="w-20 h-20 mx-[1%] rounded-md overflow-hidden" resizeMode="cover">
+      <ImageBackground source={{uri:imageURL}} className="w-20 h-20 mx-[1%] rounded-md overflow-hidden border-[1rem] border-slate-500" resizeMode="cover">
             <View className="flex self-end mr-[5%]" style={{shadowColor:"#000000", shadowOpacity:1, elevation:30, shadowRadius:10}}>
                 <Text style={[GlobalStyles.CustomFont,{textShadowColor:'#060606', textShadowRadius:5, textShadowOffset:{height:1, width:1}}]} className="text-xs text-[#fff]">{userDetails?.username}</Text>
             </View>

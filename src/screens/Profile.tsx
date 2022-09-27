@@ -73,10 +73,13 @@ export default function Profile() {
             </View>
 
             {/* Account Setting */}
-            <View className="">
+            <View>
                 <Text className="text-2xl pt-[10%] pl-[4%]" style={GlobalStyles.CustomFont}>Account Settings</Text>
             </View>
-            <SettingList iconName="person-outline" text="Personal information"/>
+            <SettingList iconName="person-outline" text="Personal information" nav={"AccountSettings"}/>
+            
+            {/* tech stacks - demo only */}
+            <SettingList iconName="computer" text="Tech stacks (Demo only)" nav={"TechStacks"}/>
         </ScrollView>
         <Footer screen="Profile"/>
     </>
