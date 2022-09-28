@@ -39,3 +39,23 @@ The app is built using
   
   * Again ``Typescript`` data typing shines when it comes to defining the data structures and entity interfaces
 
+## Useful packages
+
+***React-native-reanimated***
+
+
+***Expo-vector-icons***
+
+
+***Gorhom-BottomSheet***
+
+
+***Expo-Radio-Button***
+
+
+***Expo-Location***
+
+
+***Expo-Native-Picker***
+
+
