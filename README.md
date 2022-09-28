@@ -11,7 +11,7 @@ The app is built using
 * Firebase - server, database & authentication
 * Typescript
 
-## Challenges Faced & Lessons
+## Challenges Faced & Lessons Learnt
 
 ***React native & Expo***
   
