@@ -11,7 +11,7 @@ import {
 } from 'firebase/auth';
 import {db} from './firebase/firebaseConfig';
 import {auth} from './firebase/firebaseConfig';
-import { doc, getDoc, setDoc} from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc} from 'firebase/firestore';
 import {useLocation} from './useLocation'    
 // interface AuthProps {
 //     user:User,
@@ -28,7 +28,7 @@ export const updateUserDetails = async (userData, userId) => {
     if(userId) {
         try {
             const docRef = doc(db,"Users",userId)
-            await setDoc(docRef, userData, {merge:true})
+            await updateDoc(docRef, userData)
         } catch (error) {
             console.log(error)
             throw new Error(error)
@@ -91,6 +91,7 @@ export const AuthProvider = ({children}) => {
                     getUserDetails(id)
                     .then(data => {
                         setCurrentUserDetails(data)
+                        // check user details
                         console.log('user details retrieved successfully')
                     })
                     .catch(error => console.log('failed to retrieve user details'))
@@ -152,6 +153,9 @@ export const AuthProvider = ({children}) => {
                     myFriends:[],
                     chatrooms:[],
                 })
+            
+            const currentUserData = await getUserDetails(userCredential.user.uid)
+            if(currentUserData) setCurrentUserDetails(currentUserData)
             console.log('successfully add user to database')
 
         } catch (error) {
@@ -164,6 +168,7 @@ export const AuthProvider = ({children}) => {
             throw new Error(error)
         }
         setLoading(false)
+        return true
     }
     
     // sign in with email and password
@@ -173,6 +178,10 @@ export const AuthProvider = ({children}) => {
         try {
             await signInWithEmailAndPassword(auth, email, password);
             setCurrentUser(auth.currentUser)
+            
+            const currentUserData = await getUserDetails(auth.currentUser.uid)
+            if(currentUserData) setCurrentUserDetails(currentUserData)
+            // console.log('currentUserData',currentUserData)
         } catch (error) {
             if(error.code.includes("wrong-password")) {
                 setError('Wrong password. Please try again.')
@@ -186,6 +195,7 @@ export const AuthProvider = ({children}) => {
             throw new Error(error.code)
         }
         setLoading(false);
+        return true
     }
 
     //sign out 
@@ -227,7 +237,7 @@ export const AuthProvider = ({children}) => {
         if(id) {
             const docRef = doc(db,"Users",id)
             try {
-                await setDoc(docRef, {online: true}, {merge:true})
+                await updateDoc(docRef, {online: true})
             } catch (error) {
                 console.log(error)
                 throw new Error(error)
@@ -241,7 +251,7 @@ export const AuthProvider = ({children}) => {
         if(id) {
             const docRef = doc(db,"Users",id)
             try {
-                await setDoc(docRef, {online: false}, {merge:true})
+                await updateDoc(docRef, {online: false})
             } catch (error) {
                 console.log(error)
                 throw new Error(error)

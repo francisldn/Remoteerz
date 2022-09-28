@@ -13,7 +13,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 export default function LoginForm() {
     const {login, loading, setLoading} = useAuth();
     // const signIn = () => {}
-    const navigation = useNavigation()
+    const {navigate} = useNavigation()
 
     const LoginSchema = yup.object().shape({
       email: yup.string().email('Please enter valid email').required('Email address is required'),
@@ -36,11 +36,18 @@ export default function LoginForm() {
             validationSchema={LoginSchema}
             onSubmit={async (values) => {
                 try{
-                    await login(values.email, values.password)
-                    navigation.navigate('Profile');
+                    const loginSuccess = await new Promise((resolve, reject) => {
+                      login(values.email, values.password)
+                        .then((data) => resolve(data))
+                        .catch(error => reject(error))
+                      }) 
+                    
+                    if (loginSuccess) {
+                      navigate('Profile');
+                    }
                 } catch (err){
                     Alert.alert(`${err.message}`)
-                    navigation.navigate('Login')
+                    navigate('Login')
                     setLoading(false)
                 }
             }}
@@ -94,10 +101,10 @@ export default function LoginForm() {
             
             <AuthButton 
               btnText="Join Remoteers" 
-              btnAction={() => navigation.navigate('SignUp')}
+              btnAction={() => navigate('SignUp')}
             />
             
-            <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
+            <TouchableOpacity onPress={() => navigate('ForgotPassword')}>
               <Text className="p-8 text-center font-bold text-blue-500">Forgot Password?</Text>
             </TouchableOpacity>
 

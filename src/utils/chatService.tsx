@@ -226,7 +226,7 @@ export const updateSingleChatroom = async (singleChat: SingleChat, currentUserCh
             ...chatData, 
             lastChat: singleChat
         }
-        await setDoc(chatRef, newChatData, {merge:true})
+        await updateDoc(chatRef, newChatData)
         console.log('chatroom data updated successfully')
 
         newCurrentUserChatDetails = currentUserChatDetails.filter(chatroom => chatroom.uid !== singleChat.chatroomId).push(newChatData)

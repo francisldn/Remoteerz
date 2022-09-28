@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { View, Text, ScrollView, Pressable } from 'react-native'
-import React,{useState, useEffect} from 'react'
+import React,{useEffect} from 'react'
 import Footer from '../components/Footer';
 import GlobalStyles from '../utils/GlobalStyles'
 import Avatar from '../components/Avatar';
@@ -9,7 +9,6 @@ import SettingList from '../components/SettingList'
 import { TouchableRipple } from 'react-native-paper';
 import { useAuth } from '../utils/useAuth';
 import LoadingSpinner from '../components/LoadingSpinner';
-import { genRandBetweenRange } from '../utils/helperFunctions';
 import { chatService } from '../utils/chatService';
 
 export default function Profile() {
@@ -20,14 +19,20 @@ export default function Profile() {
 
   useEffect(() => {
     try {
-        getUserDetails(currentUser.uid).then((data) => setCurrentUserDetails(data))
-
+        // getUserDetails(currentUser.uid).then((data) => setCurrentUserDetails(data))
+        console.log('current user details',currentUserDetails)
     } catch(error) {
         console.log(error)
     }
   },[])
   
-  if(loading && !currentUserDetails) return <LoadingSpinner />
+  if(!currentUserDetails || loading) return (
+    <ScrollView style={{flex:1}} contentContainerStyle={{display:'flex',paddingTop:'50%'}}>
+        <View>
+            <LoadingSpinner size={"large"}/>
+        </View>
+    </ScrollView>
+  )
 
   return (
     <>

@@ -1,6 +1,6 @@
 // @ts-nocheck
-import { View, Text, Alert  } from 'react-native'
-import React, {useState, useEffect, useRef, useCallback} from 'react'
+import { View, Text, Alert, ScrollView  } from 'react-native'
+import React, {useState, useRef, useCallback} from 'react'
 import Footer from '../components/Footer';
 import GlobalStyles from '../utils/GlobalStyles'
 import Avatar from '../components/Avatar';
@@ -224,7 +224,14 @@ export default function EditProfile() {
     }
   })
 
-  if(loading) return <LoadingSpinner/>
+  if(!currentUserDetails || loading) return (
+    
+    <ScrollView style={{flex:1}} contentContainerStyle={{display:'flex',paddingTop:'50%'}}>
+        <View>
+            <LoadingSpinner size={"large"}/>
+        </View>
+    </ScrollView>
+  )
 
 
   return (
