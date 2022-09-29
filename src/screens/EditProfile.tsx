@@ -17,7 +17,7 @@ import AuthButton from '../components/AuthButton';
 import ProfileFormInputLabel from '../components/ProfileFormInputLabel';
 import ProfileInputRadioButton from '../components/ProfileInputRadioButton';
 import ProfileInputAgePicker from '../components/ProfileInputAgePicker';
-import { CapFirstCharacter } from '../utils/helperFunctions';
+import { capFirstCharacter } from '../utils/helperFunctions';
 import BottomSheet, {BottomSheetView, useBottomSheetSpringConfigs} from '@gorhom/bottom-sheet';
 import * as ImagePicker from 'expo-image-picker';
 import { uploadImageToFirestore } from '../utils/helperFunctions';
@@ -28,8 +28,8 @@ export default function EditProfile() {
   const {currentUserDetails, loading, setCurrentUserDetails, updateUserDetails, getUserDetails} = useAuth()
   const {placeholderImages} = chatService()
   const navigation = useNavigation()
-  const [displayValue, setDisplayValue] = useState(CapFirstCharacter(currentUserDetails?.display_status) || 'Public' );
-  const [genderValue, setGenderValue] = useState(CapFirstCharacter(currentUserDetails?.gender)|| 'Male');
+  const [displayValue, setDisplayValue] = useState(capFirstCharacter(currentUserDetails?.display_status) || 'Public' );
+  const [genderValue, setGenderValue] = useState(capFirstCharacter(currentUserDetails?.gender)|| 'Male');
   const [image, setImage] = useState(currentUserDetails?.image || placeholderImages[Math.round(Math.random())])
   const [isOpen, setIsOpen] = useState(false);
   const [age, setAge] = useState(currentUserDetails?.age?.toString() || '18')
@@ -401,7 +401,7 @@ export default function EditProfile() {
 
                 {/* Sexual orientation */}
                 <ProfileFormInputLabel inputLabel='SEXUAL ORIENTATION'/>
-                <ProfileInputRadioButton setValues={setValues} defaultValue={CapFirstCharacter(currentUserDetails?.sexual_orientation) || 'Straight'}/>
+                <ProfileInputRadioButton setValues={setValues} defaultValue={capFirstCharacter(currentUserDetails?.sexual_orientation) || 'Straight'}/>
                 {errors.sexual_orientation && <Text className="text-red-500 pl-[4%] pb-[2%]">{errors.sexual_orientation}</Text>}
                 
                 {/* Job Title */}
