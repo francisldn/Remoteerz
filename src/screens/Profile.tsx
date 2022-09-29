@@ -75,7 +75,7 @@ export default function Profile() {
             <SettingList iconName="person-outline" text="Personal information" nav={"AccountSettings"}/>
             
             {/* tech stacks - demo only */}
-            <SettingList iconName="computer" text="Tech stacks (Demo only)" nav={"TechStacks"}/>
+            {/* <SettingList iconName="computer" text="Tech stacks (Demo only)" nav={"TechStacks"}/> */}
         </ScrollView>
         <Footer screen="Profile"/>
     </>

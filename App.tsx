@@ -118,13 +118,13 @@ export default function App() {
             name="AccountSettings"
             component={AccountSettings}
           />
-          <Stack.Screen
+          {/* <Stack.Screen
             name="TechStacks"
             component={TechStacks}
             options= {() => ({
               title:"Tech Stacks (for Demo only)",
             })}
-          />
+          /> */}
         </Stack.Navigator>
       </NavigationContainer>
       </ChatProvider>

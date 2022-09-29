@@ -3,6 +3,27 @@
 ## Introduction
 Remote working has become a major phenomenon post-Covid lockdown as more jobs have become remote-enabled. Remoteers is a mobile app that connects remote workers, allowing remoteers to interact with each other through chatting and organizing events. 
 
+## Screens
+
+[![Watch the video](https://img.youtube.com/vi/JZAlGMGUTpE/maxresdefault.jpg)](https://youtu.be/JZAlGMGUTpE)
+
+***Dashboard Screen***
+<img src="./assets/DemoDashboard.png"/>
+
+***Hangouts Screen***
+<img src="./assets/DemoHangouts.png"/>
+
+***Hangout User Details Screen***
+<img src="./assets/DemoUserDetails.png"/>
+
+***Chats Screen***
+<img src="./assets/DemoChats.png"/>
+
+***Profile Screen***
+<img src="./assets/DemoProfile.png"/>
+
+***Profile Preview Screen***
+<img src="./assets/DemoPreview.png"/>
 ## Tech Stacks
 The app is built using 
 * React native/ Expo (iOS) - mobile frontend framework
