@@ -16,15 +16,6 @@ export default function Profile() {
   const {placeholderImages} = chatService();
   const profileImage = currentUserDetails?.image?.toString()|| placeholderImages[Math.round(Math.random())]
   const navigation = useNavigation()
-
-  useEffect(() => {
-    try {
-        // getUserDetails(currentUser.uid).then((data) => setCurrentUserDetails(data))
-        console.log('current user details',currentUserDetails)
-    } catch(error) {
-        console.log(error)
-    }
-  },[])
   
   if(!currentUserDetails || loading) return (
     <ScrollView style={{flex:1}} contentContainerStyle={{display:'flex',paddingTop:'50%'}}>

@@ -2,7 +2,7 @@
 import { getStorage, ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 import { updateUserDetails } from './useAuth';
 
-export const CapFirstCharacter = (str:string) => {
+export const capFirstCharacter = (str:string) => {
     if (!str) return ''
 
     return str.charAt(0).toUpperCase() + str.slice(1)
@@ -16,7 +16,6 @@ export const uploadImageToFirestore = async (imgURL, userId) => {
     try {
         const response = await fetch(imgURL);
         const bytes = await response.blob();
-        console.log(bytes)
         const filename= imgURL.substring(imgURL.lastIndexOf('/')+1);
         const storageRef = ref(storage, filename)
 
@@ -46,13 +45,13 @@ export const uploadImageToFirestore = async (imgURL, userId) => {
                     // Handle successful uploads on complete
                     // For instance, get the download URL: https://firebasestorage.googleapis.com/...
                     getDownloadURL(uploadTask.snapshot.ref)
-                        .then((downloadURL) => {
-                            resolve(downloadURL)
-                        })
-                        .catch(error => {
-                            console.log(error)
-                            reject(error)
-                        })
+                    .then((downloadURL) => {
+                        resolve(downloadURL)
+                    })
+                    .catch(error => {
+                        console.log(error)
+                        reject(error)
+                    })
                 })
         })
         

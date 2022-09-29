@@ -1,11 +1,11 @@
 // @ts-nocheck
-import { View, Text, StyleSheet, Pressable } from 'react-native'
+import { View, Text, Pressable } from 'react-native'
 import React from 'react'
-import {MaterialIcons} from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 interface BottomIconProps {
-    iconName:string;
-    text:string;
-    pressHandler:() => {};
+    iconName: string;
+    text: string;
+    pressHandler: () => {};
     textMarginLeft?: number;
     iconMarginLeft?: number;
     iconColor?: boolean

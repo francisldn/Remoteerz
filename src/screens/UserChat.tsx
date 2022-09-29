@@ -1,15 +1,10 @@
 // @ts-nocheck
-import {View, StyleSheet, Text, SafeAreaView, ScrollView, Dimensions, KeyboardAvoidingView} from 'react-native';
-import React,{useState, useEffect, useRef} from 'react'
-import { useAuth } from '../utils/useAuth';
-import Footer from '../components/Footer';
-import {Message} from '../utils/message'
+import { View, StyleSheet, Text, SafeAreaView, ScrollView, Dimensions, KeyboardAvoidingView } from 'react-native';
+import React,{ useState, useEffect, useRef } from 'react'
 import ChatBubble from '../components/ChatBubble';
-import { sortMessageByDate } from '../utils/time';
 import GlobalStyles from '../utils/GlobalStyles';
 import ChatInputBar from '../components/ChatInputBar';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import {getChatsByChatroomId} from '../utils/chatService'
 import { chatService } from '../utils/chatService';
 import {useKeyboard} from '@react-native-community/hooks'
 const screenHeight = Dimensions.get('window').height;

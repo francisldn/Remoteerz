@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React,{ createContext, useContext, useEffect, useMemo, useState } from 'react'
-import {db} from './firebase/firebaseConfig';
+import { db } from './firebase/firebaseConfig';
 import { collection, query, where, getDocs, doc, deleteDoc, setDoc, updateDoc } from "firebase/firestore";
 import { updateUserDetails, getUserDetails, useAuth } from './useAuth';
 import { getDistance, sortUsersByDistance } from './helperFunctions';
@@ -138,7 +138,6 @@ export const getUserChatroomIdList = async (userId) => {
 export const chatroomExist = (chatUserId, currentUserId, chatroomIdList) => {
     const chatroomId = [chatUserId + currentUserId, currentUserId + chatUserId]
     for(let i=0; i<chatroomId.length; i++) {
-        console.log(chatroomIdList)
         if(chatroomIdList.find(id => id === chatroomId[i])) return chatroomId[i]
     }
     return false;

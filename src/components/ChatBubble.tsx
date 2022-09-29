@@ -15,7 +15,7 @@ const ChatBubble = ({singleMsg}) => {
 
     const leftOrRight = (currentUserDetails, user) => {
         // left is false (chat user), right is true (current user)
-        return user.uid === currentUserDetails.uid ? true : false
+        return user.uid === currentUserDetails.uid 
     }
 
     const bubbleDirection = leftOrRight(currentUserDetails, user)

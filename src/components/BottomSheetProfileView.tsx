@@ -3,7 +3,7 @@ import React, { useMemo } from "react";
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import GlobalStyles from "../utils/GlobalStyles";
-import { CapFirstCharacter } from "../utils/helperFunctions";
+import { capFirstCharacter } from "../utils/helperFunctions";
 import { Ionicons } from '@expo/vector-icons'; 
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useAuth } from "../utils/useAuth";
@@ -45,7 +45,7 @@ export default function BottomSheetProfileView({userDetails, preview}) {
             console.log('current user details not loaded.')
             return
         }
-        return currentUserDetails?.myFriends.includes(id) ? true : false;
+        return currentUserDetails?.myFriends.includes(id);
     }
 
     const addToFriends = async (id:string) => {
@@ -146,7 +146,7 @@ export default function BottomSheetProfileView({userDetails, preview}) {
                     <Text className="text-gray-300 text-md" style={GlobalStyles.CustomFont}>About</Text>
                 </View>
                 <View className="w-[60%]">
-                    <Text className="text-white text-md" style={GlobalStyles.CustomFont} numberOfLines={1} ellipsizeMode="tail">{CapFirstCharacter(userDetails?.about)}</Text>
+                    <Text className="text-white text-md" style={GlobalStyles.CustomFont} numberOfLines={1} ellipsizeMode="tail">{capFirstCharacter(userDetails?.about)}</Text>
                 </View>
             </View>
             <View className="flex flex-row pt-5 pb-5 border-b-[0.3rem] border-opacity-10 border-b-[#aeaeae]">
@@ -154,7 +154,7 @@ export default function BottomSheetProfileView({userDetails, preview}) {
                     <Text className="text-gray-300 text-md" style={GlobalStyles.CustomFont}>Interests</Text>
                 </View>
                 <View className="w-[60%]">
-                    <Text className="text-white text-md" style={GlobalStyles.CustomFont} numberOfLines={1} ellipsizeMode="tail">{CapFirstCharacter(userDetails?.interests)}</Text>
+                    <Text className="text-white text-md" style={GlobalStyles.CustomFont} numberOfLines={1} ellipsizeMode="tail">{capFirstCharacter(userDetails?.interests)}</Text>
                 </View>
             </View>
             <View className="flex flex-row pt-5 pb-5 border-b-[0.3rem] border-opacity-10 border-b-[#aeaeae]">
@@ -162,7 +162,7 @@ export default function BottomSheetProfileView({userDetails, preview}) {
                     <Text className="text-gray-300 text-md" style={GlobalStyles.CustomFont}>Gender</Text>
                 </View>
                 <View className="w-[60%]">
-                    <Text className="text-white text-md" style={GlobalStyles.CustomFont} numberOfLines={1} ellipsizeMode="tail">{CapFirstCharacter(userDetails?.gender)}</Text>
+                    <Text className="text-white text-md" style={GlobalStyles.CustomFont} numberOfLines={1} ellipsizeMode="tail">{capFirstCharacter(userDetails?.gender)}</Text>
                 </View>
             </View>
             <View className="flex flex-row pt-5 pb-5 border-b-[0.3rem] border-opacity-10 border-b-[#aeaeae]">
@@ -170,7 +170,7 @@ export default function BottomSheetProfileView({userDetails, preview}) {
                     <Text className="text-gray-300 text-md" style={GlobalStyles.CustomFont}>Sexual Orientation</Text>
                 </View>
                 <View className="w-[60%]">
-                    <Text className="text-white text-md" style={GlobalStyles.CustomFont} numberOfLines={1} ellipsizeMode="tail">{CapFirstCharacter(userDetails?.sexual_orientation)}</Text>
+                    <Text className="text-white text-md" style={GlobalStyles.CustomFont} numberOfLines={1} ellipsizeMode="tail">{capFirstCharacter(userDetails?.sexual_orientation)}</Text>
                 </View>
             </View>
             <View className="flex flex-row pt-5 pb-5 border-b-[0.3rem] border-opacity-10 border-b-[#aeaeae]">
@@ -178,7 +178,7 @@ export default function BottomSheetProfileView({userDetails, preview}) {
                     <Text className="text-gray-300 text-md" style={GlobalStyles.CustomFont}>Job Title</Text>
                 </View>
                 <View className="w-[60%]">
-                    <Text className="text-white text-md" style={GlobalStyles.CustomFont} numberOfLines={1} ellipsizeMode="tail">{CapFirstCharacter(userDetails?.job_title)}</Text>
+                    <Text className="text-white text-md" style={GlobalStyles.CustomFont} numberOfLines={1} ellipsizeMode="tail">{capFirstCharacter(userDetails?.job_title)}</Text>
                 </View>
             </View>
             <View className="flex flex-row pt-5 pb-5 border-b-[0.3rem] border-opacity-10 border-b-[#aeaeae]">
@@ -186,7 +186,7 @@ export default function BottomSheetProfileView({userDetails, preview}) {
                     <Text className="text-gray-300 text-md" style={GlobalStyles.CustomFont}>Skills</Text>
                 </View>
                 <View className="w-[60%]">
-                    <Text className="text-white text-md" style={GlobalStyles.CustomFont} numberOfLines={1} ellipsizeMode="tail">{CapFirstCharacter(userDetails?.skills)}</Text>
+                    <Text className="text-white text-md" style={GlobalStyles.CustomFont} numberOfLines={1} ellipsizeMode="tail">{capFirstCharacter(userDetails?.skills)}</Text>
                 </View>
             </View>
             <View className="flex flex-row pt-5 pb-5 border-b-[0.3rem] border-opacity-10 border-b-[#aeaeae]">
@@ -194,7 +194,7 @@ export default function BottomSheetProfileView({userDetails, preview}) {
                     <Text className="text-gray-300 text-md" style={GlobalStyles.CustomFont}>Countries Travelled</Text>
                 </View>
                 <View className="w-[60%]">
-                    <Text className="text-white text-md" style={GlobalStyles.CustomFont} numberOfLines={1} ellipsizeMode="tail">{CapFirstCharacter(userDetails?.countries_travelled)}</Text>
+                    <Text className="text-white text-md" style={GlobalStyles.CustomFont} numberOfLines={1} ellipsizeMode="tail">{capFirstCharacter(userDetails?.countries_travelled)}</Text>
                 </View>
             </View>
             <View className="flex flex-row pt-5 pb-5 border-b-[0.3rem] border-opacity-10 border-b-[#aeaeae]">
@@ -202,7 +202,7 @@ export default function BottomSheetProfileView({userDetails, preview}) {
                     <Text className="text-gray-300 text-md" style={GlobalStyles.CustomFont}>Countries Lived</Text>
                 </View>
                 <View className="w-[60%]">
-                    <Text className="text-white text-md" style={GlobalStyles.CustomFont} numberOfLines={1} ellipsizeMode="tail">{CapFirstCharacter(userDetails?.countries_lived)}</Text>
+                    <Text className="text-white text-md" style={GlobalStyles.CustomFont} numberOfLines={1} ellipsizeMode="tail">{capFirstCharacter(userDetails?.countries_lived)}</Text>
                 </View>
             </View>
             <View className="flex flex-row pt-5 pb-5 border-b-[0.3rem] border-opacity-10 border-b-[#aeaeae]">
@@ -210,7 +210,7 @@ export default function BottomSheetProfileView({userDetails, preview}) {
                     <Text className="text-gray-300 text-md" style={GlobalStyles.CustomFont}>Favourite Cities</Text>
                 </View>
                 <View className="w-[60%]">
-                    <Text className="text-white text-md" style={GlobalStyles.CustomFont} numberOfLines={1} ellipsizeMode="tail">{CapFirstCharacter(userDetails?.favourite_cities)}</Text>
+                    <Text className="text-white text-md" style={GlobalStyles.CustomFont} numberOfLines={1} ellipsizeMode="tail">{capFirstCharacter(userDetails?.favourite_cities)}</Text>
                 </View>
             </View>
           </BottomSheetScrollView>

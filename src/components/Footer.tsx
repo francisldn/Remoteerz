@@ -8,18 +8,10 @@ export default function Footer({screen}) {
     const navigation = useNavigation()
   return (
     <View className="flex flex-row justify-around bg-white h-[12%]">
-        {screen === 'Dashboard'
-            ? <BottomIcon iconName="dashboard" text="Dashboard" iconMarginLeft={7} pressHandler={() => navigation.navigate('Dashboard')} iconColor={true}/>
-            : <BottomIcon iconName="dashboard" text="Dashboard" iconMarginLeft={7} pressHandler={() => navigation.navigate('Dashboard')} />}
-        {screen === 'Hangouts' 
-            ? <BottomIcon iconName="emoji-people" text="Hangouts" pressHandler={() => navigation.navigate('Hangouts')} iconColor={true} />
-            : <BottomIcon iconName="emoji-people" text="Hangouts" pressHandler={() => navigation.navigate('Hangouts')} />}
-        {screen === 'Chatroom' 
-            ? <BottomIcon iconName="chat" text="Chats" textMarginLeft={5}  pressHandler={() => navigation.navigate('Chatroom')} iconColor={true}/>
-            : <BottomIcon iconName="chat" text="Chats" textMarginLeft={5}  pressHandler={() => navigation.navigate('Chatroom')} />}
-        {screen === 'Profile' 
-            ? <BottomIcon iconName="person" text="Profile" textMarginLeft={5}  pressHandler={() => navigation.navigate('Profile')} iconColor={true}/>
-            : <BottomIcon iconName="person" text="Profile" textMarginLeft={5}  pressHandler={() => navigation.navigate('Profile')} />}
+        <BottomIcon iconName="dashboard" text="Dashboard" iconMarginLeft={7} pressHandler={() => navigation.navigate('Dashboard')} iconColor={screen === 'Dashboard'}/>
+        <BottomIcon iconName="emoji-people" text="Hangouts" pressHandler={() => navigation.navigate('Hangouts')} iconColor={screen === 'Hangouts'} />
+        <BottomIcon iconName="chat" text="Chats" textMarginLeft={5}  pressHandler={() => navigation.navigate('Chatroom')} iconColor={screen === 'Chatroom' }/>
+        <BottomIcon iconName="person" text="Profile" textMarginLeft={5}  pressHandler={() => navigation.navigate('Profile')} iconColor={screen === 'Profile' }/>
     </View>
   )
 }
