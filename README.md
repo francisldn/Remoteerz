@@ -9,7 +9,7 @@ Remote working has become a major phenomenon post-Covid lockdown as more jobs ha
 
 ***Dashboard Screen***
 
-<img src="./assets/DemoDashboard.png" width="10" height"75"/>
+<img src="./assets/DemoDashboard.png" width="100" height"75"/>
 
 ***Hangouts Screen***
 <img src="./assets/DemoHangouts.png"/>
