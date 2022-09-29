@@ -8,6 +8,7 @@ Remote working has become a major phenomenon post-Covid lockdown as more jobs ha
 ***Video Demo***
 [![Watch the video](https://img.youtube.com/vi/JZAlGMGUTpE/maxresdefault.jpg)](https://youtu.be/JZAlGMGUTpE)
 
+## Tech Stacks
 The app is built using 
 * React native/ Expo (iOS) - mobile frontend framework
 * NativeWind (TailwindCSS equivalent for mobile) - styling
