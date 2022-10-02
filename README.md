@@ -24,7 +24,7 @@ The app is built using
 
   * packages - not all npm packages are compatible for mobile development - for example, react-native navigation package is different from react-router-dom.
 
-  * The props which are passed through react-native-navigator will not re-render when the state changes. Therefore, to ensure that the UI is re-rendered whenever the state changes, we should managed the state via React Context API or using a state management library such as Redux
+  * The props which are passed through react-native-navigator will not re-render when the state changes. Therefore, to ensure that the UI is re-rendered whenever the state changes, the state should be managed via React Context API or using a state management library such as Redux
   
   * Differences in Styling and React elements - For example, ``Div`` element is known as ``View`` in React native; to allow for scrolling of a list of items, we have to use ``ScrollView`` and ``Flatlist`` elements. Also instead of using the standard TailwindCSS for styling, I have to use [NativeWind](https://www.nativewind.dev/), the mobile equivalent.
   
