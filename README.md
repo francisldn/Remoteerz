@@ -1,7 +1,10 @@
-# REMOTEERS
+# REMOTEERZ
+
+<img src="/assets/RemoteerzApp.png" alt="remoteerz">
 
 ## Introduction
-Remote working has become a major phenomenon post-Covid lockdown as more jobs have become remote-enabled. Remoteers is a mobile app that connects remote workers, allowing remoteers to interact with each other through chatting and organizing events. 
+Remote working has become a major phenomenon post-Covid lockdown as more jobs have become remote-enabled. 
+Remoteerz is a mobile app that connects remote workers, allowing remoteers to interact with each other through chatting and organizing events. 
 
 ## How the app works
 The MVP of the app allows a user to:
