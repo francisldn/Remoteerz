@@ -3,10 +3,24 @@
 ## Introduction
 Remote working has become a major phenomenon post-Covid lockdown as more jobs have become remote-enabled. Remoteers is a mobile app that connects remote workers, allowing remoteers to interact with each other through chatting and organizing events. 
 
-## Screens
+## How the app works
+The MVP of the app allows a user to:
+* sign up or login
+* create a user profile, fill in personal details and change user photo
+* update user details
+* add/remove Friend to list of friends
+* chat with other users
 
+## Screens
 ***Video Demo***
+Click here to watch the app demo:
 [![Watch the video](https://img.youtube.com/vi/JZAlGMGUTpE/maxresdefault.jpg)](https://youtu.be/JZAlGMGUTpE)
+
+## How to start the app in local environment (Expo)
+1. Clone the repo 
+2. Run ``yarn`` from the *root folder* to install the dependencies
+3. Fill in the ``.env`` file with the environmental variables from Firebase, as per the ``.env.example`` file
+4. Run ``expo start`` to start the app, then press **i** to open the app in iOS simulator (this app is developed for iOS users)
 
 ## Tech Stacks
 The app is built using 
@@ -14,7 +28,7 @@ The app is built using
 * NativeWind (TailwindCSS equivalent for mobile) - styling
 * Formik - form validation
 * Firebase - server, database & authentication
-* Typescript
+* Typescript for everything
 
 ## Challenges Faced & Lessons Learnt
 
@@ -24,7 +38,7 @@ The app is built using
 
   * packages - not all npm packages are compatible for mobile development - for example, react-native navigation package is different from react-router-dom.
 
-  * The props which are passed through react-native-navigator will not re-render when the state changes. Therefore, to ensure that the UI is re-rendered whenever the state changes, the state should be managed via React Context API or using a state management library such as Redux
+  * The props which are passed through react-native-navigator will not re-render when the state changes. Therefore, to ensure that the UI is re-rendered whenever the state changes, the state should be managed via React Context API or a state management library such as Redux
   
   * Differences in Styling and React elements - For example, ``Div`` element is known as ``View`` in React native; to allow for scrolling of a list of items, we have to use ``ScrollView`` and ``Flatlist`` elements. Also instead of using the standard TailwindCSS for styling, I have to use [NativeWind](https://www.nativewind.dev/), the mobile equivalent.
   
