@@ -44,7 +44,6 @@ export async function getCurrentLocation() {
       }
     } catch (error) {
       console.log('failed to get user location')
-      throw new Error(error)
     }
   }
 
